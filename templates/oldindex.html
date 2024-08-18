@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="nofollow" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="../static/index.css">
+        <script src="https://unpkg.com/htmx.org@2.0.1" 
+        integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" 
+        crossorigin="anonymous"></script>
+
+    </head>
+    <body>
+        <div class="navbar">
+            <div class="navbar-left">
+                <a href="#">Sign Up</a>
+                <a href="#" id="loginBtn">Log In</a>
+            </div>
+            <div class="navbar-right">
+                <a href="#">Home</a>
+            </div>
+        </div>
+
+
+        <!-- Popup window -->
+        <div id="popup" class="popup">
+            <div class="popup-header">
+                <h2>Log In</h2>
+                <button id="closeBtn" class="close-btn">&times;</button>
+            </div>
+            <form>
+                <input type="text" placeholder="Username" required>
+                <input type="password" placeholder="Password" required>
+                <input type="submit" value="Log In">
+            </form>
+        </div>
+
+        <script>
+            // Get elements
+            const loginBtn = document.getElementById('loginBtn');
+            const closeBtn = document.getElementById('closeBtn');
+            const popup = document.getElementById('popup');
+            const overlay = document.getElementById('overlay');
+
+            // Show popup when login button is clicked
+            loginBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                popup.style.display = 'block';
+                overlay.style.display = 'block';
+            });
+
+            // Hide popup when close button is clicked
+            closeBtn.addEventListener('click', function() {
+                popup.style.display = 'none';
+                overlay.style.display = 'none';
+            });
+
+            // Hide popup when clicking outside of the popup
+            overlay.addEventListener('click', function() {
+                popup.style.display = 'none';
+                overlay.style.display = 'none';
+            });
+        </script>
+
+        <div id="main">
+            <h1>Items</h1>
+            <ul id="items">
+                {{range .items}}
+                <li id="item-{{.ID}}" hx-swap="delete">
+                    {{.Name}} - £{{.Price}}
+                    <button hx-target="#item-{{.ID}}" hx-delete="/items/{{.ID}}">Delete</button>
+                    <form
+                        id="editPrice{{.ID}}"
+                        hx-put="/items/edit/{{.ID}}"
+                        hx-target="#item-{{.ID}}"
+                        hx-swap="innerHTML">
+                        <input name="price"/>
+                        <button>Save</button>
+                    </form>
+                </li>
+                {{else}}
+                <li>
+                    No items found
+                </li>
+                {{end}}
+            </ul>
+            <form 
+                hx-post="/items"
+                hx-target="#items"
+                hx-swap="beforeend">
+                <label for="name">Item Name:</label>
+                <input name="name" id="name"/>
+                <label for="price">Item Price:</label>
+                <input name="price"/>
+                <label for="ID">Item ID:</label>
+                <input name="ID"/>
+                <button>Save</button>
+            </form>
+    
+            <div>
+                <button hx-get="/signup" hx-push-url="true" hx-target="#main">Sign up</button>
+            </div>
+
+            <div>
+                <form
+                hx-post="/login">
+                    <label for="login-username">User Name:</label>
+                    <input name="login-username" id="login-username"/>
+                    <label for="login-password">Password:</label>
+                    <input name="login-password"  id="login-password"/>
+                    <button>Login</button>
+                </form>
+            </div>
+
+            
+        </div>
+    </body>
+</html>

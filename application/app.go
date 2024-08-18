@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -21,6 +22,17 @@ func New(config Config) *App {
 	app := &App{
 		config:      config,
 		mySQLconfig: config.MySQLConfig,
+	}
+
+	var err error
+	app.db, err = sql.Open("mysql", app.mySQLconfig.FormatDSN())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pingErr := app.db.Ping()
+	if pingErr != nil {
+		log.Fatal(pingErr)
 	}
 
 	app.loadRoutes()
