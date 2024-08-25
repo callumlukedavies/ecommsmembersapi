@@ -1,16 +1,16 @@
-<html>
-    <div class="grid-item" id="item-{{.ID}}">
-        <p>{{.Name}} - £<span class="price">{{.Price}}</span></p>
-        <div class="button-container">
-            <button class="edit-btn" onclick="toggleEditForm('{{.ID}}')">Edit</button>
-            <button hx-target="#item-{{.ID}}" hx-delete="/shopapi/{{.ID}}" hx-swap="outerHTML">Delete</button>
-        </div>
-        <form class="edit-form" id="editPrice{{.ID}}" 
-              hx-put="/shopapi/{{.ID}}/{{.Name}}"
-              hx-target="#item-{{.ID}}"
-              hx-swap="outerHTML">
-            <input name="price" placeholder="New Price"/>
-            <button type="submit">Save</button>
-        </form>
+{{define "item"}}
+<div class="grid-item" id="item-{{.ID}}">
+    <p>{{.Name}} - £<span class="price">{{.Price}}</span></p>
+    <div class="button-container">
+        <button class="edit-btn" onclick="toggleEditForm('{{.ID}}')">Edit</button>
+        <button hx-target="#item-{{.ID}}" hx-delete="/shopapi/{{.ID}}" hx-swap="outerHTML">Delete</button>
     </div>
-</html>
+    <form class="edit-form" id="editPrice{{.ID}}" 
+          hx-put="/shopapi/{{.ID}}/{{.Name}}"
+          hx-target="#item-{{.ID}}"
+          hx-swap="outerHTML">
+        <input name="price" placeholder="New Price"/>
+        <button type="submit">Save</button>
+    </form>
+</div>
+{{end}}

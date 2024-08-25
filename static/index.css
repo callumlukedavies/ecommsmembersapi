@@ -213,3 +213,41 @@ body {
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 999;
 }
+
+/* Sign Up form styling */
+.form-signup {
+    max-width: 400px; /* Maximum width for the form */
+    margin: 0 auto; /* Center the form horizontally */
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-signup .form-group {
+    margin-bottom: 15px; /* Space between input fields */
+}
+
+.form-signup input[type="text"],
+.form-signup input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.form-signup input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.form-signup input[type="submit"]:hover {
+    background-color: #0056b3; /* Darker blue for hover effect */
+}

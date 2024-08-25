@@ -1,0 +1,22 @@
+{{define "content"}}
+<h1>Sign Up</h1>
+    <form action="/membersapi/createuser" method="POST" class="form-signup">
+        <div class="form-group">
+            <input name="firstname" type="text" placeholder="First Name" required>
+        </div>
+        <div class="form-group">
+            <input name="lastname" type="text" placeholder="Last Name" required>
+        </div>
+        <div class="form-group">
+            <input name="emailaddress" type="text" placeholder="Email Address" required>
+        </div>
+        <div class="form-group">
+            <input name="dateofbirth" type="text" placeholder="Date of Birth" required>
+        </div>
+        <div class="form-group">
+            <input name="password" type="password" placeholder="Password" required>
+        </div>
+        <input type="submit" value="Sign up" class="btn btn-primary">
+    </form>
+{{end}}
+

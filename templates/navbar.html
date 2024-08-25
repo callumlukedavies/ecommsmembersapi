@@ -1,0 +1,30 @@
+{{define "navbar"}}
+<div class="navbar">
+    <div class="navbar-left">
+        <a href="/membersapi/signup" id="signupBtn">Sign Up</a>
+        <a href="#" id="loginBtn">Log In</a>
+    </div>
+    <div class="navbar-right">
+        <a href="/shopapi/">Home</a>
+    </div>
+</div>
+
+<!-- Overlay-->
+<div id="overlay" class="overlay"></div>
+<!-- Popup window -->
+<div id="popup" class="popup">
+    <div class="popup-header">
+        <h2>Log In</h2>
+        <button id="closeBtn" class="close-btn">&times;</button>
+    </div>
+    <form
+    hx-post="/membersapi/signin"
+    hx-swap="outerHTML"
+    hx-target="#main"
+    >
+        <input name="Username" type="text" placeholder="Username" required>
+        <input name="Password" type="password" placeholder="Password" required>
+        <input type="submit" value="Log In">
+    </form>
+</div>
+{{end}}

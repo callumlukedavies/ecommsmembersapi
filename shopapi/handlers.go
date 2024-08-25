@@ -2,6 +2,7 @@ package shopapi
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -26,9 +27,20 @@ func (shop *Shop) GetAllProductsHandler(c *gin.Context) {
 
 	response.Items = items
 
-	c.HTML(http.StatusOK, "index.html", gin.H{
+	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/itemsgrid.html", "templates/item.html")
+	if err != nil {
+		log.Fatalf("Error parsing templates: %v", err)
+	}
+
+	c.Header("Content-Type", "text/html")
+
+	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
+		"Title": "Home",
 		"items": response.Items,
 	})
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
+	}
 }
 
 func (shop *Shop) CreateItemHandler(c *gin.Context) {
