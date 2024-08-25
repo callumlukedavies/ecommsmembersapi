@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-crypt/crypt"
 	"github.com/go-crypt/crypt/algorithm"
 	"github.com/go-crypt/crypt/algorithm/argon2"
 )
@@ -23,8 +24,32 @@ func (userDatabase *UserDatabase) CreateUserHandler(c *gin.Context) {
 	dob := c.PostForm("dateofbirth")
 	password := c.PostForm("password")
 
+	var errors map[string]string
+	errors = make(map[string]string, 5)
+	if len(firstname) < 3 {
+		errors["firstname"] = "First Name must be at least 3 characters long."
+	}
+
+	if len(lastname) < 3 {
+		errors["lastname"] = "Last Name must be at least 3 characters long."
+	}
+
+	userExists, err := userDatabase.DataAccess.CheckUserExists(email)
+	if err != nil {
+		fmt.Printf("CreateUserHandler: An error occurred checking if email exists\n")
+	}
+
+	if userExists {
+		errors["email"] = "Email address already exists."
+	}
+
+	if len(errors) > 0 {
+		// Return validation errors
+		c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
+		return
+	}
+
 	var hasher *argon2.Hasher
-	var err error
 	var digest algorithm.Digest
 
 	if hasher, err = argon2.New(
@@ -41,11 +66,11 @@ func (userDatabase *UserDatabase) CreateUserHandler(c *gin.Context) {
 
 	err = userDatabase.DataAccess.CreateUser(firstname, lastname, email, dob, encodedPass)
 	if err != nil {
-		fmt.Printf("There was an error creating the user. Error log: %s", err)
+		fmt.Printf("CreateUserHandler: Error occurred adding new user to database: %s\n", err.Error())
+		errors["general"] = "An unexpected error occurred. Please try again later."
+		c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
 		return
 	}
-
-	// fmt.Printf("User created. UserID: %v", userID)
 
 	c.Redirect(http.StatusSeeOther, "/shopapi/")
 }
@@ -64,12 +89,32 @@ func (userDatabase *UserDatabase) UpdateUserHandler(c *gin.Context) {
 }
 
 func (userDatabase *UserDatabase) GetUserHandler(c *gin.Context) {
-	emailAddr := c.PostForm("Username")
+	emailAddr := c.PostForm("EmailAddress")
 	password := c.PostForm("Password")
 
-	userData, err := userDatabase.DataAccess.GetUser(emailAddr, password)
+	var (
+		decoder *crypt.Decoder
+		err     error
+		digest  algorithm.Digest
+	)
+
+	userData, err := userDatabase.DataAccess.GetUser(emailAddr)
 	if err != nil {
 		fmt.Printf("Something went wrong with getting the user: %s", err)
+	}
+
+	if decoder, err = crypt.NewDefaultDecoder(); err != nil {
+		panic(err)
+	}
+
+	if digest, err = decoder.Decode(userData.Hash); err != nil {
+		panic(err)
+	}
+
+	if digest.Match(password) {
+		// correct password, redirect to profile page
+	} else {
+		// incorrect password, update form
 	}
 
 	c.HTML(http.StatusOK, "profile.html", gin.H{

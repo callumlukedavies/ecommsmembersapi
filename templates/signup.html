@@ -1,22 +1,29 @@
 {{define "content"}}
 <h1>Sign Up</h1>
-    <form action="/membersapi/createuser" method="POST" class="form-signup">
+    <form id="form-signup" action="/membersapi/createuser" method="POST" class="form-signup">
         <div class="form-group">
-            <input name="firstname" type="text" placeholder="First Name" required>
+            <input id="signup-firstname" name="firstname" type="text" placeholder="First Name" required>
+            <span class="error-message" style="color: red;" id="firstname-error"></span>
         </div>
         <div class="form-group">
-            <input name="lastname" type="text" placeholder="Last Name" required>
+            <input id="signup-lastname" name="lastname" type="text" placeholder="Last Name" required>
+            <span class="error-message" style="color: red;" id="lastname-error"></span>
         </div>
         <div class="form-group">
-            <input name="emailaddress" type="text" placeholder="Email Address" required>
+            <input id="signup-emailaddress" name="emailaddress" type="text" placeholder="Email Address" required>
+            <span class="error-message" style="color: red;" id="emailaddress-error"></span>
         </div>
         <div class="form-group">
-            <input name="dateofbirth" type="text" placeholder="Date of Birth" required>
+            <input id="signup-dateofbirth" name="dateofbirth" type="text" placeholder="Date of Birth" required>
+            <span class="error-message" style="color: red;" id="dateofbirth-error"></span>
         </div>
         <div class="form-group">
-            <input name="password" type="password" placeholder="Password" required>
+            <input id="signup-password" name="password" type="password" placeholder="Password" required>
+            <span class="error-message" style="color: red;" id="password-error"></span>
         </div>
+        <span class="error-message" style="color: red;" id="general-error"></span>
         <input type="submit" value="Sign up" class="btn btn-primary">
     </form>
+    <script src="../static/js/signupvalidation.js"></script>
 {{end}}
 
