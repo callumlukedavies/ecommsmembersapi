@@ -11,13 +11,14 @@ import (
 	"github.com/go-crypt/crypt"
 	"github.com/go-crypt/crypt/algorithm"
 	"github.com/go-crypt/crypt/algorithm/argon2"
+	"github.com/gorilla/sessions"
 )
 
 type UserDatabase struct {
 	DataAccess DataAccess
 }
 
-func (userDatabase *UserDatabase) CreateUserHandler(c *gin.Context) {
+func (userDatabase *UserDatabase) CreateUserHandler(c *gin.Context, store *sessions.CookieStore) {
 	firstname := c.PostForm("firstname")
 	lastname := c.PostForm("lastname")
 	email := c.PostForm("emailaddress")
@@ -72,7 +73,59 @@ func (userDatabase *UserDatabase) CreateUserHandler(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusSeeOther, "/shopapi/")
+	c.JSON(http.StatusOK, nil)
+}
+
+func (userDatabase *UserDatabase) LoginHandler(c *gin.Context, store *sessions.CookieStore) {
+	emailAddr := c.PostForm("EmailAddress")
+	password := c.PostForm("Password")
+
+	userExists, err := userDatabase.DataAccess.CheckUserExists(emailAddr)
+	if err != nil {
+		fmt.Printf("LoginHandler: An error occurred checking if email exists\n")
+	}
+
+	var errors map[string]string
+	errors = make(map[string]string, 2)
+	if !userExists {
+		errors["email"] = "Email address doesn't exist"
+		c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
+		return
+	}
+
+	var (
+		decoder *crypt.Decoder
+		digest  algorithm.Digest
+	)
+
+	userData, err := userDatabase.DataAccess.GetUser(emailAddr)
+	if err != nil {
+		fmt.Printf("LoginHandler: Something went wrong with getting the user: %s", err.Error())
+	}
+
+	if decoder, err = crypt.NewDefaultDecoder(); err != nil {
+		panic(err)
+	}
+
+	if digest, err = decoder.Decode(userData.Hash); err != nil {
+		panic(err)
+	}
+
+	if !digest.Match(password) {
+		errors["password"] = "Wrong password. Please try again."
+		c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
+		return
+	}
+
+	session, _ := store.Get(c.Request, "session")
+	session.Values["Authenticated"] = true
+	session.Values["FirstName"] = userData.FirstName
+	session.Values["LastName"] = userData.LastName
+	session.Values["EmailAddress"] = userData.EmailAddress
+	session.Values["DateOfBirth"] = userData.DateOfBirth
+	session.Save(c.Request, c.Writer)
+
+	c.JSON(http.StatusOK, nil)
 }
 
 func (userDatabase *UserDatabase) UpdateUserHandler(c *gin.Context) {
@@ -88,40 +141,6 @@ func (userDatabase *UserDatabase) UpdateUserHandler(c *gin.Context) {
 	}
 }
 
-func (userDatabase *UserDatabase) GetUserHandler(c *gin.Context) {
-	emailAddr := c.PostForm("EmailAddress")
-	password := c.PostForm("Password")
-
-	var (
-		decoder *crypt.Decoder
-		err     error
-		digest  algorithm.Digest
-	)
-
-	userData, err := userDatabase.DataAccess.GetUser(emailAddr)
-	if err != nil {
-		fmt.Printf("Something went wrong with getting the user: %s", err)
-	}
-
-	if decoder, err = crypt.NewDefaultDecoder(); err != nil {
-		panic(err)
-	}
-
-	if digest, err = decoder.Decode(userData.Hash); err != nil {
-		panic(err)
-	}
-
-	if digest.Match(password) {
-		// correct password, redirect to profile page
-	} else {
-		// incorrect password, update form
-	}
-
-	c.HTML(http.StatusOK, "profile.html", gin.H{
-		"user": userData,
-	})
-}
-
 func (userDatabase *UserDatabase) DeleteUserHandler(c *gin.Context) {
 
 	param := c.Param("ID")
@@ -131,17 +150,12 @@ func (userDatabase *UserDatabase) DeleteUserHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "deleteditem.html", nil)
 }
 
+// Get templated files
 func (UserDatabase *UserDatabase) GetSignUpPageHandler(c *gin.Context) {
-
-	// tmpl := template.Must(template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/signup.html"))
-	// c.Header("Content-Type", "text/html")
-	// tmpl.ExecuteTemplate(c.Writer, "layout", gin.H{
-	// 	"Title": "Sign Up",
-	// })
 
 	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/signup.html")
 	if err != nil {
-		log.Fatalf("Error parsing templates: %v", err)
+		log.Printf("GetSignUpPageHandler: Error parsing templates: %s", err.Error())
 	}
 
 	c.Header("Content-Type", "text/html")
@@ -149,6 +163,38 @@ func (UserDatabase *UserDatabase) GetSignUpPageHandler(c *gin.Context) {
 	// Execute the main layout template with the "signup" content embedded
 	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
 		"Title": "Sign Up",
+	})
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
+	}
+}
+
+func (UserDatabase *UserDatabase) GetProfilePageHandler(c *gin.Context, store *sessions.CookieStore) {
+
+	// Get session values
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		log.Println("GetProfilePageHandler: Error getting session: %s", err.Error())
+	}
+
+	firstname := session.Values["FirstName"]
+	lastname := session.Values["LastName"]
+	email := session.Values["EmailAddress"]
+	dateofbirth := session.Values["DateOfBirth"]
+
+	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/profile.html")
+	if err != nil {
+		log.Printf("GetProfilePageHandler: Error parsing templates: %s", err.Error())
+	}
+
+	c.Header("Content-Type", "text/html")
+
+	// Execute the main layout template with the "signup" content embedded
+	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
+		"FirstName":    firstname,
+		"LastName":     lastname,
+		"EmailAddress": email,
+		"DateOfBirth":  dateofbirth,
 	})
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)

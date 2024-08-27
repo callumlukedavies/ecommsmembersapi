@@ -55,6 +55,7 @@ document.getElementById('form-signup').addEventListener('submit', function (even
                 }
             });
         } else {
+            window.location.href = '/shopapi/';
             return response.json();
         }
     })

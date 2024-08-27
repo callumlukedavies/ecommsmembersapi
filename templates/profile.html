@@ -1,32 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-    <h1>Users name</h1>
+{{define "content"}}
+<h1>Your details</h1>
+<div id="userDetailsContainer">
+    <button id="editUserDetailsBtn">Edit</button>
+    <h6>Name: {{.FirstName }} {{.LastName }}</h6>
+    <h6>Email Address: {{.EmailAddress }}</h6>
+    <h6>Date of Birth: {{.DateOfBirth}}</h6>
+</div>
 
-        <h1>Your details</h1>
-        <div id="userDetailsContainer">
-            <button id="editUserDetailsBtn">Edit</button>
-
-            <h6>Name: {{.user.EmailAddress }}</h6>
-            <h6>Email Address: {{.user.Password }}</h6>
-            <h6>Date of Birth: </h6>
-
-        </div>
-
-        <h1>Your Items</h1>
-        <div id="userItemsContainer">
-
-            <div>
-                <h6>User item 1</h6>
-            </div>
-
-            <div>
-                <h6>User item 2</h6>
-            </div>
-
-            <div>
-                <h6>User item 3</h6>
-            </div>
-
-        </div>
+<h1>Your Items</h1>
+<div id="userItemsContainer">
+    <div>
+        <h6>User item 1</h6>
     </div>
-</html>
+
+    <div>
+        <h6>User item 2</h6>
+    </div>
+
+    <div>
+        <h6>User item 3</h6>
+    </div>
+</div>
+{{end}}

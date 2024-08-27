@@ -29,7 +29,7 @@ func (shop *Shop) GetAllProductsHandler(c *gin.Context) {
 
 	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/itemsgrid.html", "templates/item.html")
 	if err != nil {
-		log.Fatalf("Error parsing templates: %v", err)
+		log.Printf("GetAllProductsHandler: Error parsing templates: %v", err)
 	}
 
 	c.Header("Content-Type", "text/html")

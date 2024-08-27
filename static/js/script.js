@@ -8,9 +8,6 @@ const overlay = document.getElementById('overlay');
 const addItemForm = document.getElementById('addItemForm');
 const submitCredsBtn = document.getElementById('submitCredentialsBtn');
 
-// submitCredsBtn.onsubmit()
-
-
 // Show popup when login button is clicked
 loginBtn.addEventListener('click', function(e) {
     e.preventDefault();

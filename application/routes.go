@@ -2,7 +2,9 @@ package application
 
 import (
 	"ecommercesite/membersapi"
+	"ecommercesite/middleware"
 	"ecommercesite/shopapi"
+	"ecommercesite/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,6 +13,7 @@ func (a *App) loadRoutes() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/static", "./static/")
+	store := util.InitializeStore()
 
 	shop := shopapi.Shop{
 		DataAccess: shopapi.DataAccess{
@@ -34,10 +37,10 @@ func (a *App) loadRoutes() {
 
 	userDatabaseRoute := router.Group("/membersapi")
 	{
-		userDatabaseRoute.POST("/signin", userDatabase.GetUserHandler)
+		userDatabaseRoute.POST("/login", func(c *gin.Context) { userDatabase.LoginHandler(c, store) })
 		userDatabaseRoute.GET("/signup", userDatabase.GetSignUpPageHandler)
-		userDatabaseRoute.POST("/createuser", userDatabase.CreateUserHandler)
-		userDatabaseRoute.PUT("/:ID", userDatabase.GetUserHandler)
+		userDatabaseRoute.GET("/profile", middleware.AuthorizeUser(store), func(c *gin.Context) { userDatabase.GetProfilePageHandler(c, store) })
+		userDatabaseRoute.POST("/createuser", func(c *gin.Context) { userDatabase.CreateUserHandler(c, store) })
 		userDatabaseRoute.DELETE("/:ID", userDatabase.DeleteUserHandler)
 	}
 

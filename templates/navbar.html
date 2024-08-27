@@ -17,14 +17,20 @@
         <h2>Log In</h2>
         <button id="closeBtn" class="close-btn">&times;</button>
     </div>
-    <form
-    hx-post="/membersapi/signin"
-    hx-swap="outerHTML"
-    hx-target="#main"
-    >
-        <input name="Username" type="text" placeholder="Username" required>
-        <input name="Password" type="password" placeholder="Password" required>
+    <form id="form-login" action="/membersapi/login" method="POST">
+        <div class="form-group">
+            <input id="login-emailaddress" name="EmailAddress" type="text" placeholder="Email Address" required>
+            <span class="error-message" style="color: red;" id="emailaddress-error"></span>
+        </div>
+
+        <div class="form-group">
+            <input id="login-password" name="Password" type="password" placeholder="Password" required>
+            <span class="error-message" style="color: red;" id="password-error"></span>
+        </div>
+        <span class="error-message" style="color: red;" id="general-error"></span>
+        
         <input type="submit" value="Log In">
     </form>
+    <script src="../static/js/loginvalidation.js"></script>
 </div>
 {{end}}
