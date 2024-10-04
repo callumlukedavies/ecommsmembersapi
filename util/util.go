@@ -3,10 +3,12 @@ package util
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"path/filepath"
 
 	"github.com/gorilla/sessions"
 )
 
+// GenerateRandomKey generates a random key based on length of input
 func GenerateRandomKey(length int) (string, error) {
 	// Create a slice to hold the random bytes
 	key := make([]byte, length)
@@ -21,6 +23,8 @@ func GenerateRandomKey(length int) (string, error) {
 	return hex.EncodeToString(key), nil
 }
 
+// InitializeStore generates a random key and creates a new session
+// to store user data in
 func InitializeStore() *sessions.CookieStore {
 	// Generate a 32-byte random key
 	key, err := GenerateRandomKey(32)
@@ -33,6 +37,8 @@ func InitializeStore() *sessions.CookieStore {
 	return store
 }
 
+// ValidatePassword checks that a password contains at least 6 characters
+// and contains at least one digit and one uppercase letter
 func ValidatePassword(password string) bool {
 	passLen := len(password)
 	var containsDigits bool
@@ -59,6 +65,8 @@ func ValidatePassword(password string) bool {
 	return true
 }
 
+// ValidateName checks whether the given contains at least two letters
+// and doesn't contain any non-letter characters
 func ValidateName(name string) bool {
 	nameLen := len(name)
 
@@ -74,4 +82,15 @@ func ValidateName(name string) bool {
 	}
 
 	return true
+}
+
+// ValidateImage checks whether the filename contains a valid file extension
+func ValidateImage(filename string) bool {
+	ext := filepath.Ext(filename)
+	switch ext {
+	case ".jpg", ".jpeg", ".png":
+		return true
+	default:
+		return false
+	}
 }
