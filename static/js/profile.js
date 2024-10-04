@@ -2,9 +2,11 @@ const addItemForm = document.getElementById('addItemForm');
 
 // Clear the Add Item Form when submitted
 addItemForm.addEventListener('submit', function(event){
-    event.preventDefault();
+    // event.preventDefault();
 
-    setTimeout(function() {
-        addItemForm.reset();
-    }, 100);
+    // setTimeout(function() {
+    //     addItemForm.reset();
+    // }, 100);
+
+    console.log("Form being submitted")
 });

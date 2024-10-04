@@ -1,6 +1,7 @@
 package shopapi
 
 import (
+	"ecommercesite/util"
 	"fmt"
 	"html/template"
 	"log"
@@ -64,12 +65,18 @@ func (shop *Shop) CreateItemHandler(c *gin.Context) {
 	}
 
 	path := filepath.Join("images", itemImage.Filename)
+
+	//validate file type
+	isValid := util.ValidateImage(path)
+	if !isValid {
+		c.String(http.StatusBadRequest, "Could not upload item: image file extension not valid")
+		return
+	}
+
 	if err = c.SaveUploadedFile(itemImage, path); err != nil {
 		c.String(http.StatusInternalServerError, "Failed to save image: %s", err.Error())
 		return
 	}
-
-	//validate file type
 
 	err = shop.DataAccess.CreateItem(itemName, itemPrice, itemImage.Filename)
 

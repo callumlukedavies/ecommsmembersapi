@@ -31,6 +31,7 @@ func (a *App) loadRoutes() {
 	{
 		shopRoute.GET("/", func(c *gin.Context) { shop.GetAllProductsHandler(c, store) })
 		shopRoute.POST("/", shop.CreateItemHandler)
+		shopRoute.POST("", shop.CreateItemHandler)
 		shopRoute.PUT("/:ID/:Name", shop.UpdatePriceHandler)
 		shopRoute.DELETE("/:ID", shop.DeleteItemHandler)
 	}
