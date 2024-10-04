@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 
+	"ecommercesite/util"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-crypt/crypt"
 	"github.com/go-crypt/crypt/algorithm"
@@ -154,7 +156,7 @@ func (userDatabase *UserDatabase) EditUserFirstNameHandler(c *gin.Context, store
 	userID := session.Values["UserID"].(int)
 
 	firstName := c.PostForm("firstname-input")
-	if !validateName(firstName) {
+	if !util.ValidateName(firstName) {
 		errorMessage := "First Name is not valid. Please try again."
 		c.JSON(http.StatusBadRequest, gin.H{"errorMessage": errorMessage})
 		return
@@ -182,7 +184,7 @@ func (userDatabase *UserDatabase) EditUserLastNameHandler(c *gin.Context, store 
 	userID := session.Values["UserID"].(int)
 
 	lastName := c.PostForm("lastname-input")
-	if !validateName(lastName) {
+	if !util.ValidateName(lastName) {
 		errorMessage := "Last Name is not valid. Please try again."
 		c.JSON(http.StatusBadRequest, gin.H{"errorMessage": errorMessage})
 		return
@@ -260,7 +262,7 @@ func (userDatabase *UserDatabase) EditUserPasswordHandler(c *gin.Context, store 
 	userID := session.Values["UserID"].(int)
 
 	password := c.PostForm("password-input")
-	if !validatePassword(password) {
+	if !util.ValidatePassword(password) {
 		errorMessage := "Password incorrect format."
 		c.JSON(http.StatusBadRequest, gin.H{"errorMessage": errorMessage})
 		return
@@ -372,47 +374,4 @@ func (UserDatabase *UserDatabase) GetEditPageHandler(c *gin.Context, store *sess
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
 	}
-}
-
-func validatePassword(password string) bool {
-	passLen := len(password)
-	var containsDigits bool
-	var containsCaps bool
-
-	if passLen < 6 {
-		return false
-	}
-
-	for i := 0; i < passLen; i++ {
-		if password[i] >= '0' && password[i] <= '9' {
-			containsDigits = true
-		}
-
-		if password[i] >= 'A' && password[i] <= 'Z' {
-			containsCaps = true
-		}
-	}
-
-	if !containsDigits || !containsCaps {
-		return false
-	}
-
-	return true
-}
-
-func validateName(name string) bool {
-	nameLen := len(name)
-
-	if nameLen < 2 {
-		return false
-	}
-
-	for i := 0; i < nameLen; i++ {
-		if !(name[i] >= 'a' && name[i] <= 'z') && !(name[i] >= 'A' && name[i] <= 'Z') {
-			return false
-		}
-
-	}
-
-	return true
 }
