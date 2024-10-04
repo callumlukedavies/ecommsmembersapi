@@ -10,23 +10,5 @@
         </div>
         {{end}}
     </div>
-
-
-    <h2>Add New Item</h2>
-    <form id="addItemForm" class="add-item-form" hx-post="/shopapi/" hx-target="#items" hx-swap="beforeend">
-        <div class="form-group">
-            <label for="nameInput">Item Name:</label>
-            <input type="text" name="name" id="nameInput" placeholder="Enter item name" required/>
-        </div>
-        <div class="form-group">
-            <label for="priceInput">Item Price:</label>
-            <input type="number" name="price" id="priceInput" placeholder="Enter item price" required/>
-        </div>
-        <div class="form-group">
-            <label for="idInput">Item ID:</label>
-            <input type="text" name="ID" id="idInput" placeholder="Enter item ID" required/>
-        </div>
-        <button type="submit" id="createItemBtn">Add Item</button>
-    </form>
 </div>
 {{end}}

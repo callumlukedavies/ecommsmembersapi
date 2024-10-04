@@ -13,6 +13,8 @@ func AuthorizeUser(store *sessions.CookieStore) gin.HandlerFunc {
 		session, err := store.Get(c.Request, "session")
 		if err != nil {
 			log.Printf("AuthRequired: Error in getting new cookie session. Error: %s", err.Error())
+			c.String(http.StatusUnauthorized, "Please login to view this page.")
+			c.Abort()
 			return
 		}
 

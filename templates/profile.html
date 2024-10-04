@@ -1,24 +1,59 @@
 {{define "content"}}
-<h1>Your details</h1>
-<div id="userDetailsContainer">
-    <button id="editUserDetailsBtn">Edit</button>
-    <h6>Name: {{.FirstName }} {{.LastName }}</h6>
-    <h6>Email Address: {{.EmailAddress }}</h6>
-    <h6>Date of Birth: {{.DateOfBirth}}</h6>
+<div class="profile-body">
+    <div class="userControlsClass">
+        <a href="/membersapi/editpage" id="editProfileBtn">Edit Profile</a>
+        <a href="javascript:void(0)" onclick="confirmDelete()" id="deleteProfileBtn">Delete Profile</a>
+    </div>
+    
+    <h1>Your Details</h1>
+    <div id="userDetailsContainer">
+        <h6><strong>Name:</strong> {{.FirstName }} {{.LastName }}</h6>
+        <h6><strong>Email Address:</strong> {{.EmailAddress }}</h6>
+        <h6><strong>Date of Birth:</strong> {{.DateOfBirth}}</h6>
+    </div>
+    
+    <h1>Your Items</h1>
+    <div id="userItemsContainer">
+        {{range .UserItems}}
+        <div class="user-item">
+            <h6>{{.ItemName}}</h6>
+        </div>
+        {{else}}
+        <p>You have no items.</p>
+        {{end}}
+    </div>
+    
+    <h1>Add New Item</h1>
+    <form method="POST" action="/shopapi/" id="addItemForm" class="add-item-form" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="nameInput">Item Name:</label>
+            <input type="text" name="name" id="nameInput" placeholder="Enter item name" required/>
+        </div>
+        <div class="form-group">
+            <label for="priceInput">Item Price:</label>
+            <input type="number" name="price" id="priceInput" placeholder="Enter item price" required/>
+        </div>
+        <div class="form-group">
+            <label for="idInput">Item ID:</label>
+            <input type="text" name="ID" id="idInput" placeholder="Enter item ID" required/>
+        </div>
+        <div class="form-group">
+            <label for="imageInput">Upload photos:</label>
+            <input type="file" name="image" id="imageInput" required/>            
+        </div>
+        <button type="submit" id="createItemBtn">Add Item</button>
+    </form>
 </div>
 
-<h1>Your Items</h1>
-<div id="userItemsContainer">
-    <div>
-        <h6>User item 1</h6>
-    </div>
 
-    <div>
-        <h6>User item 2</h6>
-    </div>
+<script>
+    // Confirmation before deleting profile
+    function confirmDelete() {
+        if (confirm("Are you sure you want to delete your profile? This action cannot be undone.")) {
+            window.location.href = "/membersapi/delete";
+        }
+    }
+</script>
+<script src="../static/js/profile.js"></script>
 
-    <div>
-        <h6>User item 3</h6>
-    </div>
-</div>
 {{end}}

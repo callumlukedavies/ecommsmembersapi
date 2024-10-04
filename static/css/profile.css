@@ -1,0 +1,120 @@
+/* General reset for consistent styling across browsers */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Basic page styling */
+.profile-body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
+    margin: 20px;
+}
+
+/* Container for the entire user details and items */
+#userDetailsContainer, #userItemsContainer {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Header styles */
+h1 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #4a90e2;
+}
+
+/* User controls for Edit and Delete */
+.userControlsClass {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.userControlsClass a {
+    background-color: #4a90e2;
+    color: #fff;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.userControlsClass a:hover {
+    background-color: #357abd;
+}
+
+/* Styling for the user details section */
+#userDetailsContainer h6 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: normal;
+}
+
+#userDetailsContainer h6 strong {
+    font-weight: bold;
+}
+
+/* Button for editing user details */
+#editUserDetailsBtn {
+    background-color: #4a90e2;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease;
+}
+
+#editUserDetailsBtn:hover {
+    background-color: #357abd;
+}
+
+/* User items section */
+#userItemsContainer .user-item {
+    background-color: #eef1f6;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+#userItemsContainer .user-item h6 {
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    body {
+        margin: 10px;
+    }
+
+    .userControlsClass {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .userControlsClass a {
+        margin: 5px 0;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    #userDetailsContainer, #userItemsContainer {
+        padding: 15px;
+    }
+
+    #userDetailsContainer h6 {
+        font-size: 16px;
+    }
+}

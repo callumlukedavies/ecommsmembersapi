@@ -5,7 +5,6 @@ const signupBtn = document.getElementById('signupBtn');
 const closeBtn = document.getElementById('closeBtn');
 const popup = document.getElementById('popup');
 const overlay = document.getElementById('overlay');
-const addItemForm = document.getElementById('addItemForm');
 const submitCredsBtn = document.getElementById('submitCredentialsBtn');
 
 // Show popup when login button is clicked
@@ -27,14 +26,6 @@ overlay.addEventListener('click', function() {
     overlay.style.display = 'none';
 });
 
-// Clear the Add Item Form when submitted
-addItemForm.addEventListener('submit', function(event){
-    event.preventDefault();
-
-    setTimeout(function() {
-        addItemForm.reset();
-    }, 100);
-});
 
 function toggleEditForm(id) {
     const form = document.getElementById(`editPrice${id}`);

@@ -40,11 +40,11 @@ func (dataaccess *DataAccess) DeleteItem(itemID int64) error {
 	return err
 }
 
-func (dataaccess *DataAccess) CreateItem(itemID string, itemName string, itemPrice string) error {
+func (dataaccess *DataAccess) CreateItem(itemName string, itemPrice string, itemImageName string) error {
 
 	_, err := dataaccess.DB.Exec("INSERT INTO itemsdb.items"+
 		"(itemID, itemName, itemImageName, itemPrice, itemSellerID)"+
-		"VALUES (?, ?, ?, ?, ?)", itemID, itemName, itemName+".svg", itemPrice, 1)
+		"VALUES (?, ?, ?, ?, ?)", 0, itemName, itemImageName, itemPrice, 1)
 
 	if err != nil {
 		return err

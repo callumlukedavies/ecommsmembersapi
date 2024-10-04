@@ -1,11 +1,16 @@
 {{define "navbar"}}
 <div class="navbar">
     <div class="navbar-left">
-        <a href="/membersapi/signup" id="signupBtn">Sign Up</a>
-        <a href="#" id="loginBtn">Log In</a>
+        <a href="/shopapi/">Home</a>
     </div>
     <div class="navbar-right">
-        <a href="/shopapi/">Home</a>
+        {{if .isAuthenticated}}
+            <a href="/membersapi/profile" id="profileBtn">Profile</a>
+            <a href="/membersapi/logout" id="logoutBtn">Log out</a>
+        {{else}}
+            <a href="/membersapi/signup" id="signupBtn">Sign Up</a>
+            <a href="#" id="loginBtn">Log In</a>
+        {{end}}
     </div>
 </div>
 

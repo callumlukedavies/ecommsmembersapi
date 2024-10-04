@@ -1,0 +1,49 @@
+{{define "content"}}
+<div class="edit-profile-body">
+    <div class="profile-container">
+        <h2>Edit User Details</h2>
+        <form id="editprofile-firstname" action="/edit-user-firstname" method="POST">
+            <div class="profile-form-group">
+                <label for="firstname-input">First Name</label>
+                <input type="text" id="firstname-input" name="firstname-input" required>
+                <span id="firstname-error" class="error-message" style="color: red;"></span>
+            </div>
+            <button type="submit" class="profile-submit-btn">Save Changes</button>
+        </form>
+    
+        <form id="editprofile-lastname" action="/edit-user-lastname" method="POST">
+            <div class="profile-form-group">
+                <label for="lastname-input">Last Name</label>
+                <input type="text" id="lastname-input" name="lastname-input" required>
+                <span id="lastname-error" class="error-message" style="color: red;"></span>
+            </div>
+            <button type="submit" class="profile-submit-btn">Save Changes</button>
+        </form>
+        <form id="editprofile-dateofbirth" action="/edit-user-dateofbirth" method="POST">
+            <div class="profile-form-group">
+                <label for="dateofbirth-input">Date of Birth</label>
+                <input type="date" id="dateofbirth-input" name="dateofbirth-input" required>
+                <span id="dateofbirth-error" class="error-message" style="color: red;"></span>
+            </div>
+            <button type="submit" class="profile-submit-btn">Save Changes</button>
+        </form>
+        <form id="editprofile-email" action="/edit-user-email" method="POST">
+            <div class="profile-form-group">
+                <label for="emailaddress-input">Email Address</label>
+                <input type="email" id="emailaddress-input" name="emailaddress-input" required>
+                <span id="emailaddress-error" class="error-message" style="color: red;"></span>
+            </div>
+            <button type="submit" class="profile-submit-btn">Save Changes</button>
+        </form>
+        <form id="editprofile-password" action="/edit-user-password" method="POST">
+            <div class="profile-form-group">
+                <label for="password-input">Password</label>
+                <input type="password" id="password-input" name="password-input" minlength="6" required>
+                <span  id="password-error" class="error-message" style="color: red;"></span>
+            </div>
+            <button type="submit" class="profile-submit-btn">Save Changes</button>
+        </form>
+    </div>
+</div>
+<script src="../static/js/editprofilevalidation.js"></script>
+{{end}}

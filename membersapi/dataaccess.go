@@ -32,7 +32,7 @@ func (dataaccess *DataAccess) GetUser(emailAddr string) (User, error) {
 	return user, nil
 }
 
-func (dataaccess *DataAccess) DeleteUser(userID int64) error {
+func (dataaccess *DataAccess) DeleteUser(userID int) error {
 	_, err := dataaccess.DB.Exec("DELETE FROM usersdb.users WHERE UserID = ?", userID)
 	return err
 }
@@ -50,9 +50,53 @@ func (dataaccess *DataAccess) CreateUser(firstName, lastname, email, dob, passwo
 	return nil
 }
 
-func (dataaccess *DataAccess) UpdateUserData(userID int64, updateKey, updateValue string) error {
+func (dataaccess *DataAccess) UpdateUserFirstName(userID int, firstName string) error {
 
-	_, err := dataaccess.DB.Exec("UPDATE usersdb.users SET %s = (?) where UserID = (?)", updateKey, updateValue, userID)
+	_, err := dataaccess.DB.Exec("UPDATE usersdb.users SET FirstName = (?) where UserID = (?)", firstName, userID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (dataaccess *DataAccess) UpdateUserLastName(userID int, lastName string) error {
+
+	_, err := dataaccess.DB.Exec("UPDATE usersdb.users SET LastName = (?) where UserID = (?)", lastName, userID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (dataaccess *DataAccess) UpdateUserDateOfBirth(userID int, dateOfBirth string) error {
+
+	_, err := dataaccess.DB.Exec("UPDATE usersdb.users SET DateOfBirth = (?) where UserID = (?)", dateOfBirth, userID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (dataaccess *DataAccess) UpdateUserEmail(userID int, emailAddress string) error {
+
+	_, err := dataaccess.DB.Exec("UPDATE usersdb.users SET EmailAddress = (?) where UserID = (?)", emailAddress, userID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (dataaccess *DataAccess) UpdateUserPassword(userID int, hashedPassword string) error {
+
+	_, err := dataaccess.DB.Exec("UPDATE usersdb.users SET HashedPassword = (?) where UserID = (?)", hashedPassword, userID)
 
 	if err != nil {
 		return err

@@ -5,16 +5,26 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/sessions"
 )
 
 type Shop struct {
 	DataAccess DataAccess
 }
 
-func (shop *Shop) GetAllProductsHandler(c *gin.Context) {
+func (shop *Shop) GetAllProductsHandler(c *gin.Context, store *sessions.CookieStore) {
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		// User session may not exist, so don't return from error
+		log.Println("GetAllProductsHandler: Error getting session: %s", err.Error())
+	}
+
+	isAuthenticated := session.Values["Authenticated"]
+
 	items, err := shop.DataAccess.GetAllItems()
 	if err != nil {
 		log.Fatal(err)
@@ -35,8 +45,9 @@ func (shop *Shop) GetAllProductsHandler(c *gin.Context) {
 	c.Header("Content-Type", "text/html")
 
 	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
-		"Title": "Home",
-		"items": response.Items,
+		"Title":           "Home",
+		"items":           response.Items,
+		"isAuthenticated": isAuthenticated,
 	})
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
@@ -46,19 +57,32 @@ func (shop *Shop) GetAllProductsHandler(c *gin.Context) {
 func (shop *Shop) CreateItemHandler(c *gin.Context) {
 	itemName := c.PostForm("name")
 	itemPrice := c.PostForm("price")
-	itemID := c.PostForm("ID")
-	err := shop.DataAccess.CreateItem(itemID, itemName, itemPrice)
+	itemImage, err := c.FormFile("image")
+	if err != nil {
+		c.String(http.StatusBadRequest, "Could not upload item: Error uploading item photo")
+		return
+	}
+
+	path := filepath.Join("images", itemImage.Filename)
+	if err = c.SaveUploadedFile(itemImage, path); err != nil {
+		c.String(http.StatusInternalServerError, "Failed to save image: %s", err.Error())
+		return
+	}
+
+	//validate file type
+
+	err = shop.DataAccess.CreateItem(itemName, itemPrice, itemImage.Filename)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	c.HTML(http.StatusOK, "item.html", gin.H{
-		"Name":  itemName,
-		"Price": itemPrice,
-		"ID":    itemID,
-	})
+	// c.HTML(http.StatusOK, "item.html", gin.H{
+	// 	"Name":  itemName,
+	// 	"Price": itemPrice,
+	// 	"ID":    itemID,
+	// })
 }
 
 func (shop *Shop) UpdatePriceHandler(c *gin.Context) {

@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-crypt/crypt"
@@ -113,27 +112,161 @@ func (userDatabase *UserDatabase) LoginHandler(c *gin.Context, store *sessions.C
 
 	if !digest.Match(password) {
 		errors["password"] = "Wrong password. Please try again."
-		c.JSON(http.StatusBadRequest, gin.H{"errors": errors})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"errors":          errors,
+			"isAuthenticated": false,
+		})
 		return
 	}
 
 	session, _ := store.Get(c.Request, "session")
 	session.Values["Authenticated"] = true
+	session.Values["UserID"] = userData.UserID
 	session.Values["FirstName"] = userData.FirstName
 	session.Values["LastName"] = userData.LastName
 	session.Values["EmailAddress"] = userData.EmailAddress
 	session.Values["DateOfBirth"] = userData.DateOfBirth
 	session.Save(c.Request, c.Writer)
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, gin.H{
+		"isAuthenticated": true,
+	})
 }
 
-func (userDatabase *UserDatabase) UpdateUserHandler(c *gin.Context) {
-	userKey := c.PostForm("price")
-	paramID := c.Param("ID")
-	userValue := c.Param("Name")
-	userID, _ := strconv.ParseInt(paramID, 10, 64)
-	err := userDatabase.DataAccess.UpdateUserData(userID, userKey, userValue)
+func (UserDatabase *UserDatabase) LogoutHandler(c *gin.Context, store *sessions.CookieStore) {
+	session, _ := store.Get(c.Request, "session")
+	for k := range session.Values {
+		delete(session.Values, k)
+	}
+
+	session.Save(c.Request, c.Writer)
+	c.Redirect(http.StatusSeeOther, "/shopapi/")
+}
+
+func (userDatabase *UserDatabase) EditUserFirstNameHandler(c *gin.Context, store *sessions.CookieStore) {
+
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		fmt.Println("EditUserFirstNameHandler error: %s", err)
+		return
+	}
+
+	userID := session.Values["UserID"].(int)
+
+	firstName := c.PostForm("firstname-input")
+	if !validateName(firstName) {
+		errorMessage := "First Name is not valid. Please try again."
+		c.JSON(http.StatusBadRequest, gin.H{"errorMessage": errorMessage})
+		return
+	}
+
+	err = userDatabase.DataAccess.UpdateUserFirstName(userID, firstName)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	session.Values["FirstName"] = firstName
+	session.Save(c.Request, c.Writer)
+}
+
+func (userDatabase *UserDatabase) EditUserLastNameHandler(c *gin.Context, store *sessions.CookieStore) {
+
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		fmt.Println("EditUserLastNameHandler error: %s", err)
+		return
+	}
+
+	userID := session.Values["UserID"].(int)
+
+	lastName := c.PostForm("lastname-input")
+	if !validateName(lastName) {
+		errorMessage := "Last Name is not valid. Please try again."
+		c.JSON(http.StatusBadRequest, gin.H{"errorMessage": errorMessage})
+		return
+	}
+
+	err = userDatabase.DataAccess.UpdateUserLastName(userID, lastName)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	session.Values["LastName"] = lastName
+	session.Save(c.Request, c.Writer)
+}
+
+func (userDatabase *UserDatabase) EditUserDateOfBirthHandler(c *gin.Context, store *sessions.CookieStore) {
+
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		fmt.Println("EditUserDateOfBirthHandler error: %s", err)
+		return
+	}
+
+	userID := session.Values["UserID"].(int)
+
+	dateOfBirth := c.PostForm("dateofbirth-input")
+	err = userDatabase.DataAccess.UpdateUserDateOfBirth(userID, dateOfBirth)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	session.Values["DateOfBirth"] = dateOfBirth
+	session.Save(c.Request, c.Writer)
+}
+
+func (userDatabase *UserDatabase) EditUserEmailHandler(c *gin.Context, store *sessions.CookieStore) {
+
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		fmt.Println("EditUserEmailHandler error: %s", err)
+		return
+	}
+
+	userID := session.Values["UserID"].(int)
+
+	email := c.PostForm("emailaddress-input")
+	if len(email) < 3 {
+		errorMessage := "Email address must be at least 3 characters long."
+		c.JSON(http.StatusBadRequest, gin.H{"errorMessage": errorMessage})
+		return
+	}
+
+	err = userDatabase.DataAccess.UpdateUserEmail(userID, email)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	session.Values["EmailAddress"] = email
+	session.Save(c.Request, c.Writer)
+}
+
+func (userDatabase *UserDatabase) EditUserPasswordHandler(c *gin.Context, store *sessions.CookieStore) {
+
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		fmt.Println("EditUserPasswordHandler error: %s", err)
+		return
+	}
+
+	userID := session.Values["UserID"].(int)
+
+	password := c.PostForm("password-input")
+	if !validatePassword(password) {
+		errorMessage := "Password incorrect format."
+		c.JSON(http.StatusBadRequest, gin.H{"errorMessage": errorMessage})
+		return
+	}
+
+	err = userDatabase.DataAccess.UpdateUserPassword(userID, password)
 
 	if err != nil {
 		fmt.Println(err)
@@ -141,11 +274,17 @@ func (userDatabase *UserDatabase) UpdateUserHandler(c *gin.Context) {
 	}
 }
 
-func (userDatabase *UserDatabase) DeleteUserHandler(c *gin.Context) {
+func (userDatabase *UserDatabase) DeleteUserHandler(c *gin.Context, store *sessions.CookieStore) {
 
-	param := c.Param("ID")
-	id, _ := strconv.ParseInt(param, 10, 64)
-	userDatabase.DataAccess.DeleteUser(id)
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		fmt.Println("EditUserPasswordHandler error: %s", err)
+		return
+	}
+
+	userID := session.Values["UserID"].(int)
+
+	userDatabase.DataAccess.DeleteUser(userID)
 
 	c.HTML(http.StatusOK, "deleteditem.html", nil)
 }
@@ -191,12 +330,89 @@ func (UserDatabase *UserDatabase) GetProfilePageHandler(c *gin.Context, store *s
 
 	// Execute the main layout template with the "signup" content embedded
 	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
-		"FirstName":    firstname,
-		"LastName":     lastname,
-		"EmailAddress": email,
-		"DateOfBirth":  dateofbirth,
+		"FirstName":       firstname,
+		"LastName":        lastname,
+		"EmailAddress":    email,
+		"DateOfBirth":     dateofbirth,
+		"isAuthenticated": true,
 	})
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
 	}
+}
+
+func (UserDatabase *UserDatabase) GetEditPageHandler(c *gin.Context, store *sessions.CookieStore) {
+
+	// Get session values
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		log.Println("GetProfilePageHandler: Error getting session: %s", err.Error())
+	}
+
+	firstname := session.Values["FirstName"]
+	lastname := session.Values["LastName"]
+	email := session.Values["EmailAddress"]
+	dateofbirth := session.Values["DateOfBirth"]
+
+	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/editprofile.html")
+	if err != nil {
+		log.Printf("GetProfilePageHandler: Error parsing templates: %s", err.Error())
+	}
+
+	c.Header("Content-Type", "text/html")
+
+	// Execute the main layout template with the "signup" content embedded
+	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
+		"FirstName":       firstname,
+		"LastName":        lastname,
+		"EmailAddress":    email,
+		"DateOfBirth":     dateofbirth,
+		"isAuthenticated": true,
+	})
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
+	}
+}
+
+func validatePassword(password string) bool {
+	passLen := len(password)
+	var containsDigits bool
+	var containsCaps bool
+
+	if passLen < 6 {
+		return false
+	}
+
+	for i := 0; i < passLen; i++ {
+		if password[i] >= '0' && password[i] <= '9' {
+			containsDigits = true
+		}
+
+		if password[i] >= 'A' && password[i] <= 'Z' {
+			containsCaps = true
+		}
+	}
+
+	if !containsDigits || !containsCaps {
+		return false
+	}
+
+	return true
+}
+
+func validateName(name string) bool {
+	nameLen := len(name)
+
+	if nameLen < 2 {
+		return false
+	}
+
+	for i := 0; i < nameLen; i++ {
+		if !(name[i] >= 'a' && name[i] <= 'z') && !(name[i] >= 'A' && name[i] <= 'Z') {
+			return false
+		}
+
+	}
+
+	return true
 }

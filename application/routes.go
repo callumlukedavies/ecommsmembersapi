@@ -29,7 +29,7 @@ func (a *App) loadRoutes() {
 
 	shopRoute := router.Group("/shopapi")
 	{
-		shopRoute.GET("/", shop.GetAllProductsHandler)
+		shopRoute.GET("/", func(c *gin.Context) { shop.GetAllProductsHandler(c, store) })
 		shopRoute.POST("/", shop.CreateItemHandler)
 		shopRoute.PUT("/:ID/:Name", shop.UpdatePriceHandler)
 		shopRoute.DELETE("/:ID", shop.DeleteItemHandler)
@@ -38,10 +38,18 @@ func (a *App) loadRoutes() {
 	userDatabaseRoute := router.Group("/membersapi")
 	{
 		userDatabaseRoute.POST("/login", func(c *gin.Context) { userDatabase.LoginHandler(c, store) })
+		userDatabaseRoute.GET("/logout", func(c *gin.Context) { userDatabase.LogoutHandler(c, store) })
 		userDatabaseRoute.GET("/signup", userDatabase.GetSignUpPageHandler)
 		userDatabaseRoute.GET("/profile", middleware.AuthorizeUser(store), func(c *gin.Context) { userDatabase.GetProfilePageHandler(c, store) })
+		userDatabaseRoute.GET("/editpage", middleware.AuthorizeUser(store), func(c *gin.Context) { userDatabase.GetEditPageHandler(c, store) })
 		userDatabaseRoute.POST("/createuser", func(c *gin.Context) { userDatabase.CreateUserHandler(c, store) })
-		userDatabaseRoute.DELETE("/:ID", userDatabase.DeleteUserHandler)
+		userDatabaseRoute.POST("/edit-user-firstname", func(c *gin.Context) { userDatabase.EditUserFirstNameHandler(c, store) })
+		userDatabaseRoute.POST("/edit-user-lastname", func(c *gin.Context) { userDatabase.EditUserLastNameHandler(c, store) })
+		userDatabaseRoute.POST("/edit-user-dateofbirth", func(c *gin.Context) { userDatabase.EditUserDateOfBirthHandler(c, store) })
+		userDatabaseRoute.POST("/edit-user-emailaddress", func(c *gin.Context) { userDatabase.EditUserEmailHandler(c, store) })
+		userDatabaseRoute.POST("/edit-user-password", func(c *gin.Context) { userDatabase.EditUserPasswordHandler(c, store) })
+
+		userDatabaseRoute.DELETE("/:ID", func(c *gin.Context) { userDatabase.DeleteUserHandler(c, store) })
 	}
 
 	router.Run(":8080")
