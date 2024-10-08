@@ -1,0 +1,125 @@
+/* Global Styling */
+.itemview-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: #333;
+}
+
+#itemview-left, #itemview-right {
+    flex: 1; /* This ensures both divs take equal space */
+    padding: 10px;
+    border: 1px solid #ccc; /* Just for visibility */
+    margin: 5px;
+    max-height: 100%;
+}
+
+h1 {
+    text-align: center;
+    color: #444;
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+/* Item Details Container */
+#itemDetailsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    background-color: #f1f1f1;
+    border-radius: 6px;
+    margin-bottom: 30px;
+}
+
+h6 {
+    margin: 0;
+    font-size: 18px;
+}
+
+h6 strong {
+    color: #555;
+}
+
+#itemDetailsContainer:nth-child(2) {
+    margin-top: 30px;
+}
+
+/* Item Image */
+img {
+    display: block;
+    max-height: 100%;
+    /* max-width: 100%; */
+    /* height: auto; */
+    width: auto;
+    border-radius: 6px;
+    margin-bottom: 30px;
+}
+
+/* Responsive Design */
+@media (max-height: 350px) {
+    #itemview-main {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    h6 {
+        font-size: 16px;
+    }
+
+    img {
+        /* width: 100%;
+        height: auto; */
+        height: 100%;
+        width: auto;
+    }
+}
+
+.carousel-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-item img {
+    max-height: 500px; /* Set the maximum height for the images */
+    width: auto;       /* Adjust the width automatically to maintain aspect ratio */
+    object-fit: contain;
+    margin: 0 auto;    /* Center the image */
+}
+  
+  .carousel-caption h5 {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .carousel-caption p {
+    font-size: 16px;
+  }
+
+  .carousel-thumbnails img {
+    width: 100px;  /* Adjust thumbnail width */
+    height: auto;
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+.carousel-thumbnails .active img {
+    border: 2px solid #007bff;  /* Highlight active thumbnail */
+}
+
+.carousel-thumbnails {
+    margin-top: 20px;
+}
+
+.thumbnail.active img {
+    border: 2px solid #007BFF; /* Add a blue border or any other style */
+}

@@ -94,3 +94,21 @@ func ValidateImage(filename string) bool {
 		return false
 	}
 }
+
+// ParseImageString takes a ';' separated list of image file paths and returns them as an array of strings
+func ParseImageString(imagesString string) []string {
+	var images []string
+	start := 0
+	for i := 0; i < len(imagesString); i++ {
+		if imagesString[i] == ';' {
+			images = append(images, imagesString[start:i])
+			start = i + 1
+		}
+	}
+
+	if images == nil {
+		return []string{imagesString}
+	}
+
+	return images
+}

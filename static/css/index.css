@@ -251,3 +251,41 @@ body {
 .form-signup input[type="submit"]:hover {
     background-color: #0056b3; /* Darker blue for hover effect */
 }
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* margin: 20px auto; */
+    max-width: 500px; /* Set a max width */
+}
+
+.search-bar input[type="search"] {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px; /* Rounded left corners */
+    outline: none;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.search-bar input[type="search"]:focus {
+    border-color: #007BFF; /* Border color on focus */
+}
+
+.search-bar button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    background-color: #007BFF; /* Primary button color */
+    color: white;
+    cursor: pointer;
+    border-radius: 0 4px 4px 0; /* Rounded right corners */
+    transition: background-color 0.3s ease-in-out;
+}
+
+.search-bar button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+

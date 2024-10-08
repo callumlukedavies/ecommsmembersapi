@@ -22,7 +22,7 @@ func (dataaccess *DataAccess) GetAllItems() ([]Item, error) {
 
 	for rows.Next() {
 		var item Item
-		if err := rows.Scan(&item.ID, &item.Name, &item.ImageName, &item.Price, &item.SellerID); err != nil {
+		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.DateUploaded, &item.Price, &item.IsSold, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
 			if err == sql.ErrNoRows {
 				fmt.Print(err)
 				return nil, sql.ErrNoRows
@@ -40,11 +40,11 @@ func (dataaccess *DataAccess) DeleteItem(itemID int64) error {
 	return err
 }
 
-func (dataaccess *DataAccess) CreateItem(itemName string, itemPrice string, itemImageName string) error {
+func (dataaccess *DataAccess) CreateItem(item Item) error {
 
 	_, err := dataaccess.DB.Exec("INSERT INTO itemsdb.items"+
-		"(itemID, itemName, itemImageName, itemPrice, itemSellerID)"+
-		"VALUES (?, ?, ?, ?, ?)", 0, itemName, itemImageName, itemPrice, 1)
+		"(ItemID, ItemName, ItemGender, ItemDescription, ItemImageName, ItemUploadDate, ItemPrice, ItemIsSold, ItemSize, ItemCategory, ItemCondition, ItemSellerID, ItemSellerName)"+
+		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", item.ID, item.Name, item.Gender, item.Description, item.ImageName, item.DateUploaded, item.Price, item.IsSold, item.Size, item.Category, item.Condition, item.SellerID, item.SellerName)
 
 	if err != nil {
 		return err
@@ -62,4 +62,22 @@ func (dataaccess *DataAccess) UpdatePrice(itemID int64, newPrice string) error {
 	}
 
 	return nil
+}
+
+func (dataaccess *DataAccess) GetItem(itemID string) (Item, error) {
+	row := dataaccess.DB.QueryRow("SELECT * FROM itemsdb.items WHERE itemID = ?", itemID)
+
+	var item Item
+	var isSoldByte []byte
+
+	if err := row.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Print(err)
+			return Item{}, sql.ErrNoRows
+		}
+	}
+
+	item.IsSold = isSoldByte[0] == 1
+
+	return item, nil
 }

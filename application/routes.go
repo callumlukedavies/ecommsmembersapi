@@ -13,6 +13,7 @@ func (a *App) loadRoutes() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/static", "./static/")
+	router.Static("/images", "./images/")
 	store := util.InitializeStore()
 
 	shop := shopapi.Shop{
@@ -30,10 +31,10 @@ func (a *App) loadRoutes() {
 	shopRoute := router.Group("/shopapi")
 	{
 		shopRoute.GET("/", func(c *gin.Context) { shop.GetAllProductsHandler(c, store) })
-		shopRoute.POST("/", shop.CreateItemHandler)
-		shopRoute.POST("", shop.CreateItemHandler)
+		shopRoute.POST("/create", func(c *gin.Context) { shop.CreateItemHandler(c, store) })
 		shopRoute.PUT("/:ID/:Name", shop.UpdatePriceHandler)
 		shopRoute.DELETE("/:ID", shop.DeleteItemHandler)
+		shopRoute.GET("/view/:ID", func(c *gin.Context) { shop.ViewItemHandler(c, store) })
 	}
 
 	userDatabaseRoute := router.Group("/membersapi")

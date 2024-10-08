@@ -24,22 +24,58 @@
     </div>
     
     <h1>Add New Item</h1>
-    <form method="POST" action="/shopapi/" id="addItemForm" class="add-item-form" enctype="multipart/form-data">
+    <form method="POST" action="/shopapi/create" id="addItemForm" class="add-item-form" enctype="multipart/form-data">
         <div class="form-group">
-            <label for="nameInput">Item Name:</label>
-            <input type="text" name="name" id="nameInput" placeholder="Enter item name" required/>
+            <label for="name-input">Item Name:</label>
+            <input type="text" name="name-input" id="name-input" placeholder="Enter item name" required/>
         </div>
         <div class="form-group">
-            <label for="priceInput">Item Price:</label>
-            <input type="number" name="price" id="priceInput" placeholder="Enter item price" required/>
+            <label for="gender-input">Choose Gender:</label>
+            <select name="gender-input" id="gender-input" required>
+                <option value="" disabled selected>Please select a gender</option>
+                <option value="Womens">Womens</option>
+                <option value="Mens">Mens</option>
+                <option value="Unisex">Unisex</option>
+            </select>
         </div>
         <div class="form-group">
-            <label for="idInput">Item ID:</label>
-            <input type="text" name="ID" id="idInput" placeholder="Enter item ID" required/>
+            <label for="description-input">Item Description:</label>
+            <input type="text" name="description-input" id="description-input" placeholder="Please enter item description" required/>
         </div>
         <div class="form-group">
-            <label for="imageInput">Upload photos:</label>
-            <input type="file" name="image" id="imageInput" accept="image/*" required/>            
+            <label for="price-input">Item Price:</label>
+            <input type="number" name="price-input" id="price-input" placeholder="Please enter item price" required/>
+        </div>
+        <div class="form-group">
+            <label for="category-input">Choose a Category:</label>
+            <select name="category-input" id="category-input" required>
+                <option value="" disabled selected>Please select a category</option>
+                <option value="Coat">Coat</option>
+                <option value="Jacket">Jacket</option>
+                <option value="Top">Top</option>
+                <option value="Knitwear">Knitwear</option>
+                <option value="Bottoms">Bottom</option>
+                <option value="Shoe">Shoe</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="size-input">Choose a Size:</label>
+            <select name="size-input" id="size-input" required></select>
+        </div>
+        <div class="form-group">
+            <label for="condition-input">Item Condition:</label>
+            <select name="condition-input" id="condition-input" required>
+                <option value="" disabled selected>Please select item condition</option>
+                <option value="BrandNew">Brand New</option>
+                <option value="LikeNew">Like New</option>
+                <option value="GoodCondition">Good Condition</option>
+                <option value="FairCondition">Fair Condition</option>
+                <option value="PoorCondition">Poor Condition</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="image-input">Upload photos:</label>
+            <input type="file" name="image-input" id="image-input" accept="image/*" multiple required/>            
         </div>
         <button type="submit" id="createItemBtn">Add Item</button>
     </form>
@@ -54,6 +90,6 @@
         }
     }
 </script>
-<script src="../static/js/profile.js"></script>
+<script src="/../static/js/profile.js"></script>
 
 {{end}}
