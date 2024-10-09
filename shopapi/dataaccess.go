@@ -81,3 +81,33 @@ func (dataaccess *DataAccess) GetItem(itemID string) (Item, error) {
 
 	return item, nil
 }
+
+func (dataaccess *DataAccess) GetItemsByQueryTerm(query string) ([]Item, error) {
+	rows, err := dataaccess.DB.Query("SELECT * FROM itemsdb.items WHERE ItemName LIKE ?", query)
+
+	if err != nil {
+		fmt.Print(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	dbItems := make([]Item, 0, 100)
+
+	for rows.Next() {
+		var item Item
+		var isSoldByte []byte
+
+		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Print(err)
+				return nil, sql.ErrNoRows
+			}
+		}
+
+		item.IsSold = isSoldByte[0] == 1
+
+		dbItems = append(dbItems, item)
+	}
+
+	return dbItems, nil
+}

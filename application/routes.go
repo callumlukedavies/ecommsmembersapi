@@ -35,6 +35,8 @@ func (a *App) loadRoutes() {
 		shopRoute.PUT("/:ID/:Name", shop.UpdatePriceHandler)
 		shopRoute.DELETE("/:ID", shop.DeleteItemHandler)
 		shopRoute.GET("/view/:ID", func(c *gin.Context) { shop.ViewItemHandler(c, store) })
+		shopRoute.POST("/search/", func(c *gin.Context) { shop.SearchHandler(c, store) })
+
 	}
 
 	userDatabaseRoute := router.Group("/membersapi")

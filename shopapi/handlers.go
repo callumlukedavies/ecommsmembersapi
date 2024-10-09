@@ -82,7 +82,6 @@ func (shop *Shop) CreateItemHandler(c *gin.Context, store *sessions.CookieStore)
 	itemName := c.PostForm("name-input")
 	itemGender := c.PostForm("gender-input")
 	itemDesc := c.PostForm("description-input")
-	// itemImage, err := c.FormFile("image-input")
 	images := form.File["image-input"]
 	itemPrice := c.PostForm("price-input")
 	itemSize := c.PostForm("size-input")
@@ -212,5 +211,49 @@ func (shop *Shop) ViewItemHandler(c *gin.Context, store *sessions.CookieStore) {
 
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
+	}
+}
+
+func (shop *Shop) SearchHandler(c *gin.Context, store *sessions.CookieStore) {
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		// User session may not exist, so don't return from error
+		log.Println("SearchHandler: Error getting session: %s", err.Error())
+	}
+
+	isAuthenticated := session.Values["Authenticated"]
+
+	queryTerm := c.PostForm("search-input")
+	query := "%" + queryTerm + "%"
+
+	items, err := shop.DataAccess.GetItemsByQueryTerm(query)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	var response struct {
+		Items []Item `json:"shopitems"`
+	}
+
+	response.Items = items
+
+	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/itemsgrid.html", "templates/item.html")
+	if err != nil {
+		log.Printf("SearchHandler: Error parsing templates: %v", err)
+		return
+	}
+
+	c.Header("Content-Type", "text/html")
+
+	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
+		"Title":           "Home",
+		"items":           response.Items,
+		"isAuthenticated": isAuthenticated,
+	})
+
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
+		return
 	}
 }
