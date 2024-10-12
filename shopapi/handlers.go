@@ -39,6 +39,10 @@ func (shop *Shop) GetAllProductsHandler(c *gin.Context, store *sessions.CookieSt
 
 	response.Items = items
 
+	for i := 0; i < len(response.Items); i++ {
+		response.Items[i].ImageName = util.GetFirstImageFromString(items[i].ImageName)
+	}
+
 	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/itemsgrid.html", "templates/item.html")
 	if err != nil {
 		log.Printf("GetAllProductsHandler: Error parsing templates: %v", err)
@@ -237,6 +241,10 @@ func (shop *Shop) SearchHandler(c *gin.Context, store *sessions.CookieStore) {
 	}
 
 	response.Items = items
+
+	for i := 0; i < len(response.Items); i++ {
+		response.Items[i].ImageName = util.GetFirstImageFromString(items[i].ImageName)
+	}
 
 	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/itemsgrid.html", "templates/item.html")
 	if err != nil {

@@ -112,3 +112,19 @@ func ParseImageString(imagesString string) []string {
 
 	return images
 }
+
+func GetFirstImageFromString(imagesString string) string {
+	endChar := 0
+	for i := 0; i < len(imagesString); i++ {
+		if imagesString[i] == ';' {
+			endChar = i
+			break
+		}
+	}
+
+	if endChar == 0 {
+		return imagesString
+	}
+
+	return imagesString[0:endChar]
+}

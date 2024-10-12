@@ -4,10 +4,12 @@
         <a href="/shopapi/">Home</a>
     </div>
 
-    <form action="/shopapi/search" method="POST" class="search-bar">
-        <input type="search" id="search-input" name="search-input" placeholder="Search..." required>
-        <button type="submit">Search</button>
-    </form>   
+    <div class="navbar-centre">
+        <form action="/shopapi/search" method="POST" class="search-bar">
+            <input type="search" id="search-input" name="search-input" placeholder="Search..." required>
+            <button type="submit">Search</button>
+        </form>   
+    </div>
     
     <div class="navbar-right">
         {{if .isAuthenticated}}
