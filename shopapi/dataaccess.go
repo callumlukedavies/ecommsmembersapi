@@ -44,7 +44,7 @@ func (dataaccess *DataAccess) CreateItem(item Item) error {
 
 	_, err := dataaccess.DB.Exec("INSERT INTO itemsdb.items"+
 		"(ItemID, ItemName, ItemGender, ItemDescription, ItemImageName, ItemGalleryImage, ItemUploadDate, ItemPrice, ItemIsSold, ItemSize, ItemCategory, ItemCondition, ItemSellerID, ItemSellerName)"+
-		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", item.ID, item.Name, item.Gender, item.Description, item.ImageName, item.GalleryImage, item.DateUploaded, item.Price, item.IsSold, item.Size, item.Category, item.Condition, item.SellerID, item.SellerName)
+		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", item.ID, item.Name, item.Gender, item.Description, item.ImageName, item.GalleryImage, item.DateUploaded, item.Price, item.IsSold, item.Size, item.Category, item.Condition, item.SellerID, item.SellerName)
 
 	if err != nil {
 		return err

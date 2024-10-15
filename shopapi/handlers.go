@@ -96,8 +96,15 @@ func (shop *Shop) CreateItemHandler(c *gin.Context, store *sessions.CookieStore)
 	var imageList string
 
 	for _, image := range images {
-		fileName := filepath.Base(image.Filename)
-		filePath := filepath.Join("images", fileName)
+		newFileName, keyErr := util.GenerateRandomKey(10)
+		if keyErr != nil {
+			newFileName = filepath.Base(image.Filename)
+			keyErr = nil
+		} else {
+			newFileName += ".jpeg"
+		}
+
+		filePath := filepath.Join("images", newFileName)
 
 		//validate file type
 		isValid := util.ValidateImage(filePath)
@@ -112,10 +119,10 @@ func (shop *Shop) CreateItemHandler(c *gin.Context, store *sessions.CookieStore)
 		}
 
 		if itemGalleryImage == "" {
-			itemGalleryImage = fileName
+			itemGalleryImage = newFileName
 		}
 
-		imageList += fileName
+		imageList += newFileName
 		imageList += ";"
 	}
 
