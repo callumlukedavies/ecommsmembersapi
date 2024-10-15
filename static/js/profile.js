@@ -32,8 +32,10 @@ categoryInput.addEventListener('change', function(event){
             { value: '34', text: '34' },
             { value: '36', text: '36' }
         ];
-    } else if (category === 'Shoes') {
+    } else if (category === 'Shoe') {
         sizes = [
+            { value: '3', text: '3' },
+            { value: '4', text: '4' },
             { value: '5', text: '5' },
             { value: '6', text: '6' },
             { value: '7', text: '7' },
