@@ -1,24 +1,37 @@
 {{define "navbar"}}
-<div class="navbar">
-    <div class="navbar-left">
-        <a href="/shopapi/" class="nav-home">SHOP</a>
+<div class="navbar-container">
+    <div class="navbar">
+        <div class="navbar-left">
+            <a href="/shopapi/" class="nav-home">SHOP</a>
+        </div>
+    
+        <div class="navbar-centre">
+            <form action="/shopapi/search" method="POST" class="search-bar">
+                <input type="search" id="search-input" name="search-input" placeholder="Search..." required>
+                <button type="submit">Search</button>
+            </form>   
+        </div>
+        
+        <div class="navbar-right">
+            {{if .isAuthenticated}}
+                <a href="/membersapi/profile" id="profileBtn">Profile</a>
+                <a href="/membersapi/logout" id="logoutBtn">Log out</a>
+            {{else}}
+                <a href="/membersapi/signup" id="signupBtn">Sign Up</a>
+                <a href="#" id="loginBtn">Log In</a>
+            {{end}}
+        </div>
     </div>
 
-    <div class="navbar-centre">
-        <form action="/shopapi/search" method="POST" class="search-bar">
-            <input type="search" id="search-input" name="search-input" placeholder="Search..." required>
-            <button type="submit">Search</button>
-        </form>   
-    </div>
-    
-    <div class="navbar-right">
-        {{if .isAuthenticated}}
-            <a href="/membersapi/profile" id="profileBtn">Profile</a>
-            <a href="/membersapi/logout" id="logoutBtn">Log out</a>
-        {{else}}
-            <a href="/membersapi/signup" id="signupBtn">Sign Up</a>
-            <a href="#" id="loginBtn">Log In</a>
-        {{end}}
+    <div class="categories-container">
+        <a href="/shopapi/category?CategoryID=Coat">Coats</a>
+        <a href="/shopapi/category?CategoryID=Jacket">Jackets</a>
+        <a href="/shopapi/category?CategoryID=Knitwear">Knitwear</a>
+        <a href="/shopapi/category?CategoryID=Top">Tops</a>
+        <a href="/shopapi/category?CategoryID=Bottoms">Bottoms</a>
+        <a href="/shopapi/category?CategoryID=Shorts">Shorts</a>
+        <a href="/shopapi/category?CategoryID=Shoe">Shoes</a>
+        <a href="/shopapi/category?CategoryID=Accessories">Accessories</a>
     </div>
 </div>
 

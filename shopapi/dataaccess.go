@@ -12,6 +12,7 @@ type DataAccess struct {
 func (dataaccess *DataAccess) GetAllItems() ([]Item, error) {
 
 	dbItems := make([]Item, 0, 10)
+	var isSoldByte []byte
 
 	rows, err := dataaccess.DB.Query("SELECT * FROM itemsdb.items")
 	if err != nil {
@@ -22,12 +23,14 @@ func (dataaccess *DataAccess) GetAllItems() ([]Item, error) {
 
 	for rows.Next() {
 		var item Item
-		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.GalleryImage, &item.DateUploaded, &item.Price, &item.IsSold, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.GalleryImage, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
 			if err == sql.ErrNoRows {
 				fmt.Print(err)
 				return nil, sql.ErrNoRows
 			}
 		}
+
+		item.IsSold = isSoldByte[0] == 1
 
 		dbItems = append(dbItems, item)
 	}
