@@ -6,6 +6,7 @@ type Item struct {
 	Gender       string `json:"ItemGender"`
 	Description  string `json:"ItemDescription"`
 	ImageName    string `json:"ItemImageName"`
+	GalleryImage string `json:"ItemGalleryImage"`
 	DateUploaded string `json:"ItemUploadDate"`
 	Price        string `json:"ItemPrice"`
 	IsSold       bool   `json:"ItemIsSold"`

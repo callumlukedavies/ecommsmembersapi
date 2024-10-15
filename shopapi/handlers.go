@@ -39,10 +39,6 @@ func (shop *Shop) GetAllProductsHandler(c *gin.Context, store *sessions.CookieSt
 
 	response.Items = items
 
-	for i := 0; i < len(response.Items); i++ {
-		response.Items[i].ImageName = util.GetFirstImageFromString(items[i].ImageName)
-	}
-
 	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/itemsgrid.html", "templates/item.html")
 	if err != nil {
 		log.Printf("GetAllProductsHandler: Error parsing templates: %v", err)
@@ -96,6 +92,7 @@ func (shop *Shop) CreateItemHandler(c *gin.Context, store *sessions.CookieStore)
 	itemSellerName := session.Values["FirstName"].(string) + " " + session.Values["LastName"].(string)
 	itemSellerID := session.Values["UserID"].(int)
 	itemCondition := c.PostForm("condition-input")
+	itemGalleryImage := ""
 	var imageList string
 
 	for _, image := range images {
@@ -112,6 +109,10 @@ func (shop *Shop) CreateItemHandler(c *gin.Context, store *sessions.CookieStore)
 		if err = c.SaveUploadedFile(image, filePath); err != nil {
 			c.String(http.StatusInternalServerError, "Failed to save image. Error: %s", err.Error())
 			return
+		}
+
+		if itemGalleryImage == "" {
+			itemGalleryImage = fileName
 		}
 
 		imageList += fileName
@@ -131,6 +132,7 @@ func (shop *Shop) CreateItemHandler(c *gin.Context, store *sessions.CookieStore)
 		Gender:       itemGender,
 		Description:  itemDesc,
 		ImageName:    imageList,
+		GalleryImage: itemGalleryImage,
 		DateUploaded: uploadDate.Format(time.DateOnly),
 		Price:        itemPrice,
 		IsSold:       false,

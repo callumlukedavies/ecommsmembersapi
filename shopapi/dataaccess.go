@@ -22,7 +22,7 @@ func (dataaccess *DataAccess) GetAllItems() ([]Item, error) {
 
 	for rows.Next() {
 		var item Item
-		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.DateUploaded, &item.Price, &item.IsSold, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.GalleryImage, &item.DateUploaded, &item.Price, &item.IsSold, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
 			if err == sql.ErrNoRows {
 				fmt.Print(err)
 				return nil, sql.ErrNoRows
@@ -43,8 +43,8 @@ func (dataaccess *DataAccess) DeleteItem(itemID int64) error {
 func (dataaccess *DataAccess) CreateItem(item Item) error {
 
 	_, err := dataaccess.DB.Exec("INSERT INTO itemsdb.items"+
-		"(ItemID, ItemName, ItemGender, ItemDescription, ItemImageName, ItemUploadDate, ItemPrice, ItemIsSold, ItemSize, ItemCategory, ItemCondition, ItemSellerID, ItemSellerName)"+
-		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", item.ID, item.Name, item.Gender, item.Description, item.ImageName, item.DateUploaded, item.Price, item.IsSold, item.Size, item.Category, item.Condition, item.SellerID, item.SellerName)
+		"(ItemID, ItemName, ItemGender, ItemDescription, ItemImageName, ItemGalleryImage, ItemUploadDate, ItemPrice, ItemIsSold, ItemSize, ItemCategory, ItemCondition, ItemSellerID, ItemSellerName)"+
+		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", item.ID, item.Name, item.Gender, item.Description, item.ImageName, item.GalleryImage, item.DateUploaded, item.Price, item.IsSold, item.Size, item.Category, item.Condition, item.SellerID, item.SellerName)
 
 	if err != nil {
 		return err
@@ -70,7 +70,7 @@ func (dataaccess *DataAccess) GetItem(itemID string) (Item, error) {
 	var item Item
 	var isSoldByte []byte
 
-	if err := row.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+	if err := row.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.GalleryImage, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Print(err)
 			return Item{}, sql.ErrNoRows
@@ -97,7 +97,7 @@ func (dataaccess *DataAccess) GetItemsByQueryTerm(query string) ([]Item, error) 
 		var item Item
 		var isSoldByte []byte
 
-		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.GalleryImage, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
 			if err == sql.ErrNoRows {
 				fmt.Print(err)
 				return nil, sql.ErrNoRows
@@ -133,7 +133,7 @@ func (dataaccess *DataAccess) getSortedItemsByPriceInc(query string) ([]Item, er
 		var item Item
 		var isSoldByte []byte
 
-		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.GalleryImage, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
 			if err == sql.ErrNoRows {
 				fmt.Print(err)
 				return nil, sql.ErrNoRows
@@ -169,7 +169,7 @@ func (dataaccess *DataAccess) getSortedItemsByPriceDec(query string) ([]Item, er
 		var item Item
 		var isSoldByte []byte
 
-		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.GalleryImage, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
 			if err == sql.ErrNoRows {
 				fmt.Print(err)
 				return nil, sql.ErrNoRows
@@ -200,7 +200,7 @@ func (dataaccess *DataAccess) getItemsByCategory(category string) ([]Item, error
 		var item Item
 		var isSoldByte []byte
 
-		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.GalleryImage, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
 			if err == sql.ErrNoRows {
 				fmt.Print(err)
 				return nil, sql.ErrNoRows

@@ -2,7 +2,7 @@
 <a href="view/{{.ID}}" class="item-card">
     <div class="grid-item" id="item-{{.ID}}">
         <div class="image-container">
-            <img src="/images/{{.ImageName}}" alt="{{.ImageName}}">
+            <img src="/images/{{.GalleryImage}}" alt="{{.GalleryImage}}">
         </div>
         
         <div class="item-info">
@@ -11,11 +11,4 @@
         </div>
     </div>
 </a>
-
-<!-- <div class="grid-item" id="item-{{.ID}}">
-    <h5><strong>{{.Name}}</strong></h5>
-    <img src="/images/{{.ImageName}}" alt="{{.ImageName}}" style="display: block; margin: 0 auto; width: 100px; height: 150px;">
-    <h6><strong class="price">£{{.Price}}</strong></h6>
-    <a href="view/{{.ID}}">View Item</a>
-</div> -->
 {{end}}
