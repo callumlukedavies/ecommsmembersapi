@@ -1,5 +1,24 @@
 {{define "content"}}
 <div id="main">
+    <div class="categories-container">
+        <a href="/shopapi/category?CategoryID=Coat">Coats</a>
+        <a href="/shopapi/category?CategoryID=Jacket">Jackets</a>
+        <a href="/shopapi/category?CategoryID=Knitwear">Knitwear</a>
+        <a href="/shopapi/category?CategoryID=Top">Tops</a>
+        <a href="/shopapi/category?CategoryID=Bottoms">Bottoms</a>
+        <a href="/shopapi/category?CategoryID=Shorts">Shorts</a>
+        <a href="/shopapi/category?CategoryID=Shoe">Shoes</a>
+        <a href="/shopapi/category?CategoryID=Accessories">Accessories</a>
+    </div>
+    <div class="sort-input-container">
+        <form action="/shopapi/sort" method="POST" class="sort-form">
+            <select name="order-input" id="order-input" onchange="this.form.submit()">
+                <option class="order-option" value="default" disabled selected>Default</option>
+                <option class="order-option" value="price-dec">Price (high)</option>
+                <option class="order-option" value="price-inc">Price (low)</option>
+            </select>
+        </form>
+    </div>
     <div class="grid-container" id="items">
         {{range .items}}
         {{block "item" .}} {{end}}

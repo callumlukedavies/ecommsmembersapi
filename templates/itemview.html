@@ -22,21 +22,23 @@
 
     <div id="itemview-right">
         <div class="item-headertext-container">
-            <h2>{{.itemName }} by {{.itemSellerName}}  <strong>£{{.itemPrice}}</strong></h2>
-            <h6><strong>Size {{.itemSize}} | {{.itemCondition}}</strong></h6>
+            <h2>{{.itemName }} by {{.itemSellerName}}</h2>
+            <h5>£{{.itemPrice}}</h5>
+
+            <h6><strong>{{.itemCategory}} | Size {{.itemSize}} | {{.itemCondition}}</strong></h6>
             <h6><strong>Uploaded on</strong> {{.itemUploadDate}}</h6>
         </div>
 
         <div id="itemDetailsContainer">
-            <h6><strong>Item Description:</strong> {{.itemDescription }}</h6>
-            <h6><strong>Item Category:</strong> {{.itemCategory}}</h6>
+            <h6><strong>Description:</strong> </h6>
+            <p>{{.itemDescription }}</p>
         </div>
         
         {{if .itemIsSold}}
             <div></div>
         {{else}}
-            <div>
-                <button>Purchase Item</button>
+            <div class="item-button-container">
+                <button class="purchase-button">Purchase Item</button>
             </div>
         {{end}}
     </div>

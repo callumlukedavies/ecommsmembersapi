@@ -2,21 +2,22 @@
 .itemview-body {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    /* align-items: center; */
     font-family: Arial, sans-serif;
     background-color: #f9f9f9;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     color: #333;
+    padding: 0px 300px;
 }
 
 #itemview-left, #itemview-right {
     flex: 1; /* This ensures both divs take equal space */
     padding: 10px;
-    border: 1px solid #ccc; /* Just for visibility */
     margin: 5px;
     max-height: 100%;
+    top: 0;
 }
 
 h1 {
@@ -31,9 +32,6 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 20px;
-    background-color: #f1f1f1;
-    border-radius: 6px;
     margin-bottom: 30px;
 }
 
@@ -122,4 +120,21 @@ img {
 
 .thumbnail.active img {
     border: 2px solid #007BFF; /* Add a blue border or any other style */
+}
+
+.item-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 5em;
+}
+
+.purchase-button {
+    text-align: center;
+    background-color: #F96900;
+    color: #ffffff;
+    width: 80%;
+    height: 50px;
+    margin: 20px 50px;
+    border: 0px;
+    align-self: center;
 }

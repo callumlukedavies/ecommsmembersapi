@@ -36,6 +36,8 @@ func (a *App) loadRoutes() {
 		shopRoute.DELETE("/:ID", shop.DeleteItemHandler)
 		shopRoute.GET("/view/:ID", func(c *gin.Context) { shop.ViewItemHandler(c, store) })
 		shopRoute.POST("/search/", func(c *gin.Context) { shop.SearchHandler(c, store) })
+		shopRoute.POST("/sort", func(c *gin.Context) { shop.SortItemsHandler(c, store) })
+		shopRoute.GET("/category", func(c *gin.Context) { shop.SearchByCategoryHandler(c, store) })
 
 	}
 

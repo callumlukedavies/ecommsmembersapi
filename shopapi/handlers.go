@@ -49,6 +49,9 @@ func (shop *Shop) GetAllProductsHandler(c *gin.Context, store *sessions.CookieSt
 		return
 	}
 
+	session.Values["CurrentQuery"] = ""
+	session.Save(c.Request, c.Writer)
+
 	c.Header("Content-Type", "text/html")
 
 	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
@@ -230,6 +233,9 @@ func (shop *Shop) SearchHandler(c *gin.Context, store *sessions.CookieStore) {
 	queryTerm := c.PostForm("search-input")
 	query := "%" + queryTerm + "%"
 
+	order := c.Param("order-input")
+	println(order)
+
 	items, err := shop.DataAccess.GetItemsByQueryTerm(query)
 	if err != nil {
 		log.Fatal(err)
@@ -251,6 +257,133 @@ func (shop *Shop) SearchHandler(c *gin.Context, store *sessions.CookieStore) {
 		log.Printf("SearchHandler: Error parsing templates: %v", err)
 		return
 	}
+
+	session.Values["CurrentQuery"] = query
+	session.Save(c.Request, c.Writer)
+
+	fmt.Printf("Session Values: %v\n", session.Values)
+
+	c.Header("Content-Type", "text/html")
+
+	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
+		"Title":           "Home",
+		"items":           response.Items,
+		"isAuthenticated": isAuthenticated,
+	})
+
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
+		return
+	}
+}
+
+func (shop *Shop) SortItemsHandler(c *gin.Context, store *sessions.CookieStore) {
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		// User session may not exist, so don't return from error
+		log.Println("SearchHandler: Error getting session: %s", err.Error())
+	}
+
+	fmt.Printf("Session Values: %v\n", session.Values)
+
+	isAuthenticated := session.Values["Authenticated"]
+
+	var query string
+	var ok bool
+	currentQuery := session.Values["CurrentQuery"]
+	if currentQuery != nil {
+		query, ok = currentQuery.(string)
+		if !ok {
+			c.JSON(500, gin.H{"error": "Current query is invalid session type"})
+			return
+		}
+	}
+
+	order := c.PostForm("order-input")
+
+	var items []Item
+	var sortErr error
+	switch order {
+	case "price-inc":
+		items, sortErr = shop.DataAccess.getSortedItemsByPriceInc(query)
+	case "price-dec":
+		items, sortErr = shop.DataAccess.getSortedItemsByPriceDec(query)
+	}
+
+	if sortErr != nil {
+		log.Printf("SortItemsHandler: Could not sort items by %s. Error: %s", order, err)
+		c.String(http.StatusInternalServerError, "Error sorting items: %v", err)
+		return
+	}
+
+	var response struct {
+		Items []Item `json:"shopitems"`
+	}
+
+	response.Items = items
+
+	for i := 0; i < len(response.Items); i++ {
+		response.Items[i].ImageName = util.GetFirstImageFromString(items[i].ImageName)
+	}
+
+	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/itemsgrid.html", "templates/item.html")
+	if err != nil {
+		log.Printf("SearchHandler: Error parsing templates: %v", err)
+		return
+	}
+
+	c.Header("Content-Type", "text/html")
+
+	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
+		"Title":           "Home",
+		"items":           response.Items,
+		"isAuthenticated": isAuthenticated,
+	})
+
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
+		return
+	}
+}
+
+func (shop *Shop) SearchByCategoryHandler(c *gin.Context, store *sessions.CookieStore) {
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		// User session may not exist, so don't return from error
+		log.Println("SearchHandler: Error getting session: %s", err.Error())
+	}
+
+	isAuthenticated := session.Values["Authenticated"]
+
+	categoryTerm := c.Query("CategoryID")
+	category := "%" + categoryTerm + "%"
+
+	items, err := shop.DataAccess.getItemsByCategory(category)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	var response struct {
+		Items []Item `json:"shopitems"`
+	}
+
+	response.Items = items
+
+	for i := 0; i < len(response.Items); i++ {
+		response.Items[i].ImageName = util.GetFirstImageFromString(items[i].ImageName)
+	}
+
+	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/itemsgrid.html", "templates/item.html")
+	if err != nil {
+		log.Printf("SearchHandler: Error parsing templates: %v", err)
+		return
+	}
+
+	session.Values["CurrentQuery"] = category
+	session.Save(c.Request, c.Writer)
+
+	fmt.Printf("Session Values: %v\n", session.Values)
 
 	c.Header("Content-Type", "text/html")
 

@@ -1,19 +1,21 @@
 {{define "item"}}
-<div class="grid-item" id="item-{{.ID}}">
-    <h5><strong>{{.Name}}</strong></h5>
-    <!-- <div class="button-container">
-        <button class="edit-btn" onclick="toggleEditForm('{{.ID}}')">Edit</button>
-        <button hx-target="#item-{{.ID}}" hx-delete="/shopapi/{{.ID}}" hx-swap="outerHTML">Delete</button>
+<a href="view/{{.ID}}" class="item-card">
+    <div class="grid-item" id="item-{{.ID}}">
+        <div class="image-container">
+            <img src="/images/{{.ImageName}}" alt="{{.ImageName}}">
+        </div>
+        
+        <div class="item-info">
+            <p>{{.Name}}</p>
+            <p class="price">£{{.Price}}</p>
+        </div>
     </div>
-    <form class="edit-form" id="editPrice{{.ID}}" 
-          hx-put="/shopapi/{{.ID}}/{{.Name}}"
-          hx-target="#item-{{.ID}}"
-          hx-swap="outerHTML">
-        <input name="price" placeholder="New Price"/>
-        <button type="submit">Save</button>
-    </form> -->
+</a>
+
+<!-- <div class="grid-item" id="item-{{.ID}}">
+    <h5><strong>{{.Name}}</strong></h5>
     <img src="/images/{{.ImageName}}" alt="{{.ImageName}}" style="display: block; margin: 0 auto; width: 100px; height: 150px;">
     <h6><strong class="price">£{{.Price}}</strong></h6>
     <a href="view/{{.ID}}">View Item</a>
-</div>
+</div> -->
 {{end}}

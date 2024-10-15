@@ -2,22 +2,40 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4; /* Consistent background */
+    background-color: #ffffff; /* Consistent background */
+}
+
+.nav-home{
+    font-family: "Plaster", system-ui;
+    /* font-weight: 100; */
+    color: #F96900 !important;
+    font-size: xx-large;
+    padding: 30px 40px;
 }
 
 /* Navbar Styles */
 .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #333;
-    padding: 10px 20px;
+    background-color: #ffffff;
+    padding: 20px 20px 20px 20px;
+    margin-bottom: 10px;
+    border-bottom: #444;
+    border-width: 2px;
 }
 
 .navbar-left {
     display: flex;
     gap: 10px;
 }
+
+/* .navbar-left a {
+
+} */
 
 .navbar-centre {
     display: flex;
@@ -30,16 +48,18 @@ body {
 }
 
 .navbar a {
-    color: white;
+    color: black;
     text-decoration: none;
-    padding: 20px 25px;
-    background-color: #444;
+    padding: 10px 15px;
+    margin: 5px;
+    background-color: #ffffff;
     border-radius: 5px;
+    border-color: #F96900;
     transition: background-color 0.3s;
 }
 
 .navbar a:hover {
-    background-color: #555;
+    background-color: #d1d0d0;
 }
 
 /* Grid Layout */
@@ -50,18 +70,63 @@ body {
     padding: 20px;
 }
 
-.grid-item {
-    background-color: #ffffff;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    text-align: center;
-    position: relative; /* For absolute positioning of the form */
+/* Ensure the entire card is clickable */
+.item-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    /* border: 1px solid #ccc; */
+    /* border-radius: 8px; */
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+    max-height: 400px;
+    width: 100%;             /* Ensure the card takes full height */
     display: flex;
-    flex-direction: column; /* To ensure form and content align properly */
-    justify-content: space-between; /* Space out content */
-    height: 250px; /* Fixed height to accommodate form */
+    flex-direction: column;    /* Ensure vertical layout (image on top) */
+    margin: 10px;
 }
+
+/* Add hover effect to the card */
+.item-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    color: black;
+}
+
+/* Style the grid item */
+.grid-item {
+    padding: 0;               /* Remove padding from the card */
+    display: flex;
+    flex-direction: column;
+    height: 100%;             /* Ensure the grid item takes full height */
+}
+
+/* Image container that takes the top portion of the card */
+.image-container {
+    flex-grow: 1;             /* Make the image container expand to fill the available space */
+    overflow: hidden;         /* Ensure the image doesn't overflow */
+}
+
+.image-container img {
+    width: 100%;              /* Ensure the image takes full width of the container */
+    height: 100%;             /* Ensure the image takes full height of the container */
+    object-fit: cover;        /* Ensure the image covers the container without distortion */
+}
+
+/* Flexbox for the item info */
+.item-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    align-items: center;
+    background-color: #ffffff;
+}
+
+/* Price styling */
+.price {
+    color: #333;
+}
+
 
 .grid-item p {
     margin: 0;
@@ -269,28 +334,67 @@ body {
     width: 100%;
     padding: 10px 15px;
     font-size: 16px;
-    border: 1px solid #ccc;
+    border: 0.5px solid #ccc;
     border-radius: 4px 0 0 4px; /* Rounded left corners */
     outline: none;
     transition: border-color 0.3s ease-in-out;
 }
 
 .search-bar input[type="search"]:focus {
-    border-color: #007BFF; /* Border color on focus */
+    border-color: #F96900; /* Border color on focus */
 }
 
 .search-bar button {
     padding: 10px 20px;
     font-size: 16px;
     border: none;
-    background-color: #007BFF; /* Primary button color */
-    color: white;
+    background-color: #F96900; 
+    color: #ffffff;
     cursor: pointer;
     border-radius: 0 4px 4px 0; /* Rounded right corners */
     transition: background-color 0.3s ease-in-out;
 }
 
-.search-bar button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+.sort-input-container {
+    display: flex;
+    justify-content: end;
+    align-items: center;
 }
 
+#order-input {
+    border: none;
+    outline: none;
+    background-color: transparent;
+    margin: 10px;
+}
+
+.sort-form {
+    display: flex;
+    width: 100px;
+    margin-right: 8em;
+    margin-top: 3em;
+}
+
+.order-option {
+    background-color: white;
+    color: black;
+    padding: 10px;
+}
+
+.categories-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    top: 5em;
+    z-index: 1000;
+    background-color: #D6B180;
+    padding: 0px 300px;
+    margin-top: 10px;
+}
+
+.categories-container a {
+    display: flex;
+    padding: 10px 20px 10px 20px;
+    color: #ffffff;
+}

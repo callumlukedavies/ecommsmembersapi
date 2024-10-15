@@ -111,3 +111,106 @@ func (dataaccess *DataAccess) GetItemsByQueryTerm(query string) ([]Item, error) 
 
 	return dbItems, nil
 }
+
+func (dataaccess *DataAccess) getSortedItemsByPriceInc(query string) ([]Item, error) {
+	var rows *sql.Rows
+	var err error
+	if query == "" {
+		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items ORDER BY ItemPrice")
+	} else {
+		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items WHERE ItemName LIKE ? ORDER BY ItemPrice", query)
+	}
+
+	if err != nil {
+		fmt.Print(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	dbItems := make([]Item, 0, 100)
+
+	for rows.Next() {
+		var item Item
+		var isSoldByte []byte
+
+		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Print(err)
+				return nil, sql.ErrNoRows
+			}
+		}
+
+		item.IsSold = isSoldByte[0] == 1
+
+		dbItems = append(dbItems, item)
+	}
+
+	return dbItems, nil
+}
+
+func (dataaccess *DataAccess) getSortedItemsByPriceDec(query string) ([]Item, error) {
+	var rows *sql.Rows
+	var err error
+	if query == "" {
+		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items ORDER BY ItemPrice DESC")
+	} else {
+		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items WHERE ItemName LIKE ? ORDER BY ItemPrice DESC", query)
+	}
+
+	if err != nil {
+		fmt.Print(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	dbItems := make([]Item, 0, 100)
+
+	for rows.Next() {
+		var item Item
+		var isSoldByte []byte
+
+		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Print(err)
+				return nil, sql.ErrNoRows
+			}
+		}
+
+		item.IsSold = isSoldByte[0] == 1
+
+		dbItems = append(dbItems, item)
+	}
+
+	return dbItems, nil
+}
+
+func (dataaccess *DataAccess) getItemsByCategory(category string) ([]Item, error) {
+
+	rows, err := dataaccess.DB.Query("SELECT * FROM itemsdb.items WHERE ItemCategory LIKE ?", category)
+
+	if err != nil {
+		fmt.Print(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	dbItems := make([]Item, 0, 100)
+
+	for rows.Next() {
+		var item Item
+		var isSoldByte []byte
+
+		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Print(err)
+				return nil, sql.ErrNoRows
+			}
+		}
+
+		item.IsSold = isSoldByte[0] == 1
+
+		dbItems = append(dbItems, item)
+	}
+
+	return dbItems, nil
+}
