@@ -96,22 +96,23 @@ func (shop *Shop) CreateItemHandler(c *gin.Context, store *sessions.CookieStore)
 	var imageList string
 
 	for _, image := range images {
+		fileBase := filepath.Base(image.Filename)
+		//validate file type
+		isValid := util.ValidateImage(fileBase)
+		if !isValid {
+			c.String(http.StatusInternalServerError, "Could not upload item: image file extension not valid. Image name: %s", fileBase)
+			return
+		}
+
 		newFileName, keyErr := util.GenerateRandomKey(10)
 		if keyErr != nil {
-			newFileName = filepath.Base(image.Filename)
+			newFileName = fileBase
 			keyErr = nil
 		} else {
 			newFileName += ".jpeg"
 		}
 
 		filePath := filepath.Join("images", newFileName)
-
-		//validate file type
-		isValid := util.ValidateImage(filePath)
-		if !isValid {
-			c.String(http.StatusInternalServerError, "Could not upload item: image file extension not valid. Image name: %s", filePath)
-			return
-		}
 
 		if err = c.SaveUploadedFile(image, filePath); err != nil {
 			c.String(http.StatusInternalServerError, "Failed to save image. Error: %s", err.Error())
