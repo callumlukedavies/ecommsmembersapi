@@ -200,9 +200,22 @@ func (shop *Shop) ViewItemHandler(c *gin.Context, store *sessions.CookieStore) {
 
 	// Retrieve item from database
 	itemData, err := shop.DataAccess.GetItem(itemID)
+	if err != nil {
+		log.Printf("ViewItemHandler: Error getting Item data: %s", err.Error())
+		return
+	}
+
+	// Retrieve items by this Seller
+	itemsBySeller, err := shop.DataAccess.GetItemsBySeller(itemData.SellerID)
+	if err != nil {
+		log.Printf("ViewItemHandler: Error getting items by seller: %s", err.Error())
+		return
+	}
+
 	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/itemview.html")
 	if err != nil {
-		log.Printf("GetProfilePageHandler: Error parsing templates: %s", err.Error())
+		log.Printf("ViewItemHandler: Error parsing templates: %s", err.Error())
+		return
 	}
 
 	images := util.ParseImageString(itemData.ImageName)
@@ -224,6 +237,7 @@ func (shop *Shop) ViewItemHandler(c *gin.Context, store *sessions.CookieStore) {
 		"itemSize":        itemData.Size,
 		"itemSellerName":  itemData.SellerName,
 		"itemSellerID":    itemData.SellerID,
+		"otherItems":      itemsBySeller,
 	})
 
 	if err != nil {

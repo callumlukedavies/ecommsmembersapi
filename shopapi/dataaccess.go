@@ -217,3 +217,33 @@ func (dataaccess *DataAccess) getItemsByCategory(category string) ([]Item, error
 
 	return dbItems, nil
 }
+
+func (dataaccess *DataAccess) GetItemsBySeller(SellerID int) ([]Item, error) {
+	rows, err := dataaccess.DB.Query("SELECT * FROM itemsdb.items WHERE ItemSellerID = ? LIMIT 8", SellerID)
+
+	if err != nil {
+		fmt.Print(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	dbItems := make([]Item, 0, 100)
+
+	for rows.Next() {
+		var item Item
+		var isSoldByte []byte
+
+		if err := rows.Scan(&item.ID, &item.Name, &item.Gender, &item.Description, &item.ImageName, &item.GalleryImage, &item.DateUploaded, &item.Price, &isSoldByte, &item.Size, &item.Category, &item.Condition, &item.SellerID, &item.SellerName); err != nil {
+			if err == sql.ErrNoRows {
+				fmt.Print(err)
+				return nil, sql.ErrNoRows
+			}
+		}
+
+		item.IsSold = isSoldByte[0] == 1
+
+		dbItems = append(dbItems, item)
+	}
+
+	return dbItems, nil
+}
