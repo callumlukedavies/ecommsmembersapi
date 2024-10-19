@@ -4,15 +4,40 @@ const sizeInput = document.getElementById('size-input');
 
 sizeInput.innerHTML = '<option value="">Please select a category before choose size</option>';
 
-// Clear the Add Item Form when submitted
 addItemForm.addEventListener('submit', function(event){
-    // event.preventDefault();
+    const formData = new FormData(this);
+    
+    fetch('/shopapi/create', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errorData => {
+                console.log("response not ok");
+                if (errorData.errors) {
+                    console.log("errordata.errors has triggered");
+                } else {
+                    generalErr.textContent = 'First Err: An unexpected error occurred. Please try again later.';
+                }
+            });
+        } else {
+            console.log("response ok");
+            window.location.href = '/shopapi/';
+            return response.json();
+        }
+    })
+    .then(data => {
+        if (data && data.success) {
+            alert('Form submitted successfully!');
+            console.log("Form submitted successfully");
 
-    // setTimeout(function() {
-    //     addItemForm.reset();
-    // }, 100);
-
-    console.log("Form being submitted")
+            window.location.href = '/shopapi/'; // Redirect to the profile page
+        }
+    })
+    .catch(error => {
+        console.log(error);
+    });
 });
 
 categoryInput.addEventListener('change', function(event){

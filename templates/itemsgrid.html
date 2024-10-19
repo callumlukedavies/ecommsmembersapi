@@ -9,6 +9,7 @@
             </select>
         </form>
     </div>
+    <h1 class="itemsgrid-header">{{.GridTitle}}</h6>
     <div class="grid-container" id="items">
         {{range .items}}
         {{block "item" .}} {{end}}

@@ -51,9 +51,11 @@ func (shop *Shop) GetAllProductsHandler(c *gin.Context, store *sessions.CookieSt
 	c.Header("Content-Type", "text/html")
 
 	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
-		"Title":           "Home",
-		"items":           response.Items,
-		"isAuthenticated": isAuthenticated,
+		"Title":                "Home",
+		"items":                response.Items,
+		"isAuthenticated":      isAuthenticated,
+		"ShowCategoriesBanner": true,
+		"GridTitle":            "New In",
 	})
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
@@ -224,20 +226,21 @@ func (shop *Shop) ViewItemHandler(c *gin.Context, store *sessions.CookieStore) {
 
 	// Execute the main layout template with the "signup" content embedded
 	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
-		"isAuthenticated": isAuthenticated,
-		"ID":              itemData.ID,
-		"itemName":        itemData.Name,
-		"itemDescription": itemData.Description,
-		"images":          images,
-		"itemUploadDate":  itemData.DateUploaded,
-		"itemPrice":       itemData.Price,
-		"itemIsSold":      itemData.IsSold,
-		"itemCategory":    itemData.Category,
-		"itemCondition":   itemData.Condition,
-		"itemSize":        itemData.Size,
-		"itemSellerName":  itemData.SellerName,
-		"itemSellerID":    itemData.SellerID,
-		"otherItems":      itemsBySeller,
+		"isAuthenticated":      isAuthenticated,
+		"ID":                   itemData.ID,
+		"itemName":             itemData.Name,
+		"itemDescription":      itemData.Description,
+		"images":               images,
+		"itemUploadDate":       itemData.DateUploaded,
+		"itemPrice":            itemData.Price,
+		"itemIsSold":           itemData.IsSold,
+		"itemCategory":         itemData.Category,
+		"itemCondition":        itemData.Condition,
+		"itemSize":             itemData.Size,
+		"itemSellerName":       itemData.SellerName,
+		"itemSellerID":         itemData.SellerID,
+		"otherItems":           itemsBySeller,
+		"ShowCategoriesBanner": false,
 	})
 
 	if err != nil {
@@ -289,10 +292,14 @@ func (shop *Shop) SearchHandler(c *gin.Context, store *sessions.CookieStore) {
 
 	c.Header("Content-Type", "text/html")
 
+	gridTitle := "Search Results for '" + queryTerm + "'"
+
 	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
-		"Title":           "Home",
-		"items":           response.Items,
-		"isAuthenticated": isAuthenticated,
+		"Title":                "Home",
+		"items":                response.Items,
+		"isAuthenticated":      isAuthenticated,
+		"ShowCategoriesBanner": true,
+		"GridTitle":            gridTitle,
 	})
 
 	if err != nil {
@@ -359,9 +366,11 @@ func (shop *Shop) SortItemsHandler(c *gin.Context, store *sessions.CookieStore) 
 	c.Header("Content-Type", "text/html")
 
 	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
-		"Title":           "Home",
-		"items":           response.Items,
-		"isAuthenticated": isAuthenticated,
+		"Title":                "Home",
+		"items":                response.Items,
+		"isAuthenticated":      isAuthenticated,
+		"ShowCategoriesBanner": true,
+		"GridTitle":            query,
 	})
 
 	if err != nil {
@@ -412,9 +421,11 @@ func (shop *Shop) SearchByCategoryHandler(c *gin.Context, store *sessions.Cookie
 	c.Header("Content-Type", "text/html")
 
 	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
-		"Title":           "Home",
-		"items":           response.Items,
-		"isAuthenticated": isAuthenticated,
+		"Title":                "Home",
+		"items":                response.Items,
+		"isAuthenticated":      isAuthenticated,
+		"ShowCategoriesBanner": true,
+		"GridTitle":            categoryTerm,
 	})
 
 	if err != nil {
