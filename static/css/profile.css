@@ -8,7 +8,7 @@
 /* Basic page styling */
 .profile-body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    background-color: #ffffff;
     color: #333;
     line-height: 1.6;
     margin: 20px;
@@ -16,10 +16,10 @@
 
 /* Container for the entire user details and items */
 #userDetailsContainer, #userItemsContainer {
+    display: flex;
+    justify-content: space-between;
     background-color: #fff;
-    border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
 }
 
