@@ -38,6 +38,10 @@ func (a *App) loadRoutes() {
 		shopRoute.POST("/search/", func(c *gin.Context) { shop.SearchHandler(c, store) })
 		shopRoute.POST("/sort", func(c *gin.Context) { shop.SortItemsHandler(c, store) })
 		shopRoute.GET("/category", func(c *gin.Context) { shop.SearchByCategoryHandler(c, store) })
+		shopRoute.POST("/updatecart", func(c *gin.Context) { shop.UpdateCartHandler(c, store) })
+		shopRoute.GET("/cart", func(c *gin.Context) { shop.GetShoppingCartHandler(c, store) })
+		shopRoute.POST("/checkout", func(c *gin.Context) { shop.CheckoutCartHandler(c, store) })
+		shopRoute.POST("/removecartitem", func(c *gin.Context) { shop.RemoveCartItemHandler(c, store) })
 
 	}
 
@@ -54,7 +58,6 @@ func (a *App) loadRoutes() {
 		userDatabaseRoute.POST("/edit-user-dateofbirth", func(c *gin.Context) { userDatabase.EditUserDateOfBirthHandler(c, store) })
 		userDatabaseRoute.POST("/edit-user-emailaddress", func(c *gin.Context) { userDatabase.EditUserEmailHandler(c, store) })
 		userDatabaseRoute.POST("/edit-user-password", func(c *gin.Context) { userDatabase.EditUserPasswordHandler(c, store) })
-
 		userDatabaseRoute.DELETE("/:ID", func(c *gin.Context) { userDatabase.DeleteUserHandler(c, store) })
 	}
 

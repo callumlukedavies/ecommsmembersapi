@@ -38,7 +38,8 @@
             <div></div>
         {{else}}
             <div class="item-button-container">
-                <button class="purchase-button">Purchase Item</button>
+                <button id="add-to-cart-btn" data-itemid="{{.ID}}">Add to cart</button>
+                <span id="add-to-cart-error" class="error-message" style="color: red;"></span>
                 <a id="category-link" href="/shopapi/category?CategoryID={{.itemCategory}}">More like this</a>
             </div>
         {{end}}

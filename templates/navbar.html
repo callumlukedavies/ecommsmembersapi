@@ -14,9 +14,11 @@
         
         <div class="navbar-right">
             {{if .isAuthenticated}}
+                <a href="/shopapi/cart" id="cart-btn">Cart</a>
                 <a href="/membersapi/profile" id="profileBtn">Profile</a>
                 <a href="/membersapi/logout" id="logoutBtn">Log out</a>
             {{else}}
+                <a href="/shopapi/cart" id="cart-btn">Cart</a>
                 <a href="/membersapi/signup" id="signupBtn">Sign Up</a>
                 <a href="#" id="loginBtn">Log In</a>
             {{end}}

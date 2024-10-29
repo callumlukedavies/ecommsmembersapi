@@ -247,3 +247,14 @@ func (dataaccess *DataAccess) GetItemsBySeller(SellerID int) ([]Item, error) {
 
 	return dbItems, nil
 }
+
+func (dataaccess *DataAccess) ListAsSold(itemID string) error {
+
+	_, err := dataaccess.DB.Exec("UPDATE itemsdb.items SET ItemIsSold = 1 where itemID = (?)", itemID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

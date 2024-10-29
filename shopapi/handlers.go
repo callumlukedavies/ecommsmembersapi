@@ -312,7 +312,7 @@ func (shop *Shop) SortItemsHandler(c *gin.Context, store *sessions.CookieStore) 
 	session, err := store.Get(c.Request, "session")
 	if err != nil {
 		// User session may not exist, so don't return from error
-		log.Println("SearchHandler: Error getting session: %s", err.Error())
+		log.Println("SortItemsHandler: Error getting session: %s", err.Error())
 	}
 
 	fmt.Printf("Session Values: %v\n", session.Values)
@@ -359,7 +359,7 @@ func (shop *Shop) SortItemsHandler(c *gin.Context, store *sessions.CookieStore) 
 
 	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/itemsgrid.html", "templates/item.html")
 	if err != nil {
-		log.Printf("SearchHandler: Error parsing templates: %v", err)
+		log.Printf("SortItemsHandler: Error parsing templates: %v", err)
 		return
 	}
 
@@ -383,7 +383,7 @@ func (shop *Shop) SearchByCategoryHandler(c *gin.Context, store *sessions.Cookie
 	session, err := store.Get(c.Request, "session")
 	if err != nil {
 		// User session may not exist, so don't return from error
-		log.Println("SearchHandler: Error getting session: %s", err.Error())
+		log.Println("SearchByCategoryHandler: Error getting session: %s", err.Error())
 	}
 
 	isAuthenticated := session.Values["Authenticated"]
@@ -409,7 +409,7 @@ func (shop *Shop) SearchByCategoryHandler(c *gin.Context, store *sessions.Cookie
 
 	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/itemsgrid.html", "templates/item.html")
 	if err != nil {
-		log.Printf("SearchHandler: Error parsing templates: %v", err)
+		log.Printf("SearchByCategoryHandler: Error parsing templates: %v", err)
 		return
 	}
 
@@ -432,4 +432,203 @@ func (shop *Shop) SearchByCategoryHandler(c *gin.Context, store *sessions.Cookie
 		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
 		return
 	}
+}
+
+func (shop *Shop) UpdateCartHandler(c *gin.Context, store *sessions.CookieStore) {
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		// User session may not exist, so don't return from error
+		log.Println("UpdateCartHandler: Error getting session: %s", err.Error())
+	}
+
+	var requestBody struct {
+		ItemID string `json:"itemID"`
+	}
+
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	itemData, err := shop.DataAccess.GetItem(requestBody.ItemID)
+	if err != nil {
+		log.Printf("UpdateCartHandler: Error getting Item data: %s", err.Error())
+		return
+	}
+
+	if itemData.IsSold {
+		c.JSON(http.StatusOK, gin.H{"error": "Item no longer available"})
+		return
+	}
+
+	var oldCartItems, newCartItems string
+	var ok bool
+	sessionCartItems := session.Values["CartItems"]
+	if sessionCartItems != nil {
+		// CartItems exists, get existing list and add new item id to it
+		oldCartItems, ok = sessionCartItems.(string)
+		if !ok {
+			log.Println("UpdateCartHandler: Error converting session CartItems value to string")
+		} else {
+			newCartItems = oldCartItems + itemData.ID + ";"
+		}
+
+	} else {
+		// CartItems doesn't yet exist on the user session, set to current Item ID
+		newCartItems = itemData.ID + ";"
+	}
+
+	session.Values["CartItems"] = newCartItems
+	session.Save(c.Request, c.Writer)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Item added to cart!"})
+}
+
+func (shop *Shop) GetShoppingCartHandler(c *gin.Context, store *sessions.CookieStore) {
+
+	// Get session values
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		log.Println("GetShoppingCartHandler: Error getting session: %s", err.Error())
+	}
+
+	firstname := session.Values["FirstName"]
+	lastname := session.Values["LastName"]
+	email := session.Values["EmailAddress"]
+	dateofbirth := session.Values["DateOfBirth"]
+	sessionCartItems := session.Values["CartItems"]
+
+	var cartItemsString string
+	var ok bool
+	if sessionCartItems != nil {
+		// Items have been added to cart
+		cartItemsString, ok = sessionCartItems.(string)
+		if !ok {
+			log.Println("GetShoppingCartHandler: Error converting session CartItems to string")
+			c.String(http.StatusInternalServerError, "Error converting session CartItems to string")
+			return
+		}
+	} else {
+		// No items in cart, return early
+		c.String(http.StatusOK, "You have no items in the cart")
+		return
+	}
+
+	startIndex := 0
+	var cartItems []Item
+	for i := 0; i < len(cartItemsString); i++ {
+		if cartItemsString[i] != ';' {
+			continue
+		}
+
+		itemData, err := shop.DataAccess.GetItem(cartItemsString[startIndex:i])
+		if err != nil {
+			log.Printf("GetShoppingCartHandler: Error getting Item data for ID %s: %s", cartItemsString[startIndex:i], err.Error())
+			err = nil
+			startIndex = i + 1
+			continue
+		}
+
+		cartItems = append(cartItems, itemData)
+		startIndex = i + 1
+	}
+
+	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/cart.html")
+	if err != nil {
+		log.Printf("GetShoppingCartHandler: Error parsing templates: %s", err.Error())
+	}
+
+	c.Header("Content-Type", "text/html")
+
+	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
+		"FirstName":       firstname,
+		"LastName":        lastname,
+		"EmailAddress":    email,
+		"DateOfBirth":     dateofbirth,
+		"IsAuthenticated": true,
+		"ItemsInCart":     true,
+		"CartItems":       cartItems,
+	})
+
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
+	}
+}
+
+func (shop *Shop) CheckoutCartHandler(c *gin.Context, store *sessions.CookieStore) {
+	var requestBody struct {
+		Items []string `json:"itemIDs"`
+	}
+
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	items := requestBody.Items
+
+	// for each item, id, search item and update its  status to sold
+	for i := 0; i < len(items); i++ {
+		err := shop.DataAccess.ListAsSold(items[i])
+		if err != nil {
+			log.Println("CheckoutCartHandler: Could not checkout cart item. Error:", err.Error())
+		}
+	}
+
+	return
+}
+
+func (shop *Shop) RemoveCartItemHandler(c *gin.Context, store *sessions.CookieStore) {
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		// User session may not exist, so don't return from error
+		log.Println("RemoveCartItemHandler: Error getting session: %s", err.Error())
+	}
+
+	var requestBody struct {
+		ItemID string `json:"itemID"`
+	}
+
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	itemID := requestBody.ItemID
+
+	var oldCartItems, updatedCartItems string
+	var ok bool
+	sessionCartItems := session.Values["CartItems"]
+	if sessionCartItems != nil {
+		// CartItems exists, get existing list and add new item id to it
+		oldCartItems, ok = sessionCartItems.(string)
+		if !ok {
+			log.Println("RemoveCartItemHandler: Error converting session CartItems value to string")
+			return
+		}
+
+	} else {
+		log.Println("RemoveCartItemHandler: Failed to get Cart Items")
+	}
+
+	start := 0
+	strlen := len(oldCartItems)
+	for i := 0; i < strlen; i++ {
+		if oldCartItems[i] != ';' {
+			continue
+		} else {
+			substr := oldCartItems[start:i]
+			if substr == itemID {
+				// how to remove ; if single item?
+				updatedCartItems = oldCartItems[0:start] + oldCartItems[i+1:strlen]
+				break
+			}
+			start = i + 1
+		}
+	}
+
+	session.Values["CartItems"] = updatedCartItems
+	session.Save(c.Request, c.Writer)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Item removed from cart!"})
 }
