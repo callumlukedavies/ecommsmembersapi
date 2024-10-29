@@ -1,0 +1,143 @@
+{{define "content"}}
+<div class="cart-container">
+    {{if .ItemsInCart}}
+        <div class="cart-details-container">
+            <div class="delivery-details">
+                <h2>Shipping Details</h2>
+                <h4>Shipping Address</h4>
+                <form action="/submit-address" method="POST">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" class="form-control" id="fullName" name="fullName" placeholder="John Doe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addressLine1">Address Line 1</label>
+                        <input type="text" class="form-control" id="addressLine1" name="addressLine1" placeholder="1234 Main St" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addressLine2">Address Line 2 (Optional)</label>
+                        <input type="text" class="form-control" id="addressLine2" name="addressLine2" placeholder="Apartment, suite, etc.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" class="form-control" id="city" name="city" placeholder="City" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="state">State/Province/Region</label>
+                        <input type="text" class="form-control" id="state" name="state" placeholder="State/Province/Region" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="postalCode">Postal Code</label>
+                        <input type="text" class="form-control" id="postalCode" name="postalCode" placeholder="Postal Code" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <select class="form-control" id="country" name="country" required>
+                            <option value="">Select Country</option>
+                            <option value="US">United States</option>
+                            <option value="CA">Canada</option>
+                            <option value="UK">United Kingdom</option>
+                            <option value="AU">Australia</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="(123) 456-7890" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required>
+                    </div>
+
+                    <h4>Payment Details</h4>
+                    <div class="form-group">
+                        <label for="cardholderName">Cardholder Name</label>
+                        <input type="text" class="form-control" id="cardholderName" name="cardholderName" placeholder="John Doe" required>
+                    </div>
+        
+                    <div class="form-group">
+                        <label for="cardNumber">Card Number</label>
+                        <input type="text" class="form-control" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                    </div>
+        
+                    <div class="form-group">
+                        <label for="expirationDate">Expiration Date</label>
+                        <div class="form-row">
+                            <div class="col">
+                                <select class="form-control" id="expMonth" name="expMonth" required>
+                                    <option value="">Month</option>
+                                    <option value="01">01 - January</option>
+                                    <option value="02">02 - February</option>
+                                    <option value="03">03 - March</option>
+                                    <option value="04">04 - April</option>
+                                    <option value="05">05 - May</option>
+                                    <option value="06">06 - June</option>
+                                    <option value="07">07 - July</option>
+                                    <option value="08">08 - August</option>
+                                    <option value="09">09 - September</option>
+                                    <option value="10">10 - October</option>
+                                    <option value="11">11 - November</option>
+                                    <option value="12">12 - December</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-control" id="expYear" name="expYear" required>
+                                    <option value="">Year</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="form-group">
+                        <label for="cvv">CVV</label>
+                        <input type="text" class="form-control" id="cvv" name="cvv" placeholder="123" maxlength="4" required>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="cart-items-container">
+            <h2 class="cart-item-number">Purchase Details</h2>
+            <div id="cart-item-number" class="cart-item-number"></div>
+            {{range .CartItems}}
+                <div class="cart-item" data-itemid="{{.ID}}" data-itemprice="{{.Price}}">
+                    <div class="cart-image-container">
+                        <img src="/images/{{.GalleryImage}}" alt="{{.GalleryImage}}">
+                    </div>
+            
+                    <div class="cart-details-container">
+                        <h6>{{.Name}}</h6>
+                        <p class="cart-item-detail">Size: {{.Size}}</p>
+                        <p class="cart-item-detail">Price: {{.Price}}</p>
+                        <button class="btn btn-danger remove-btn">Remove</button>
+                    </div>
+                </div>
+            {{end}}
+            <div class="cart-summary-container"> 
+                <h2>Summary:</h2>
+                <strong><p id="cart-subtotal" class="cart-item-detail"></p></strong>
+                <strong><p id="cart-delivery" class="cart-item-detail"></p></strong>
+                <strong><p id="cart-total" class="cart-item-detail"></p></strong>
+
+                
+                <button id="checkout-btn" type="submit" class="btn btn-primary">Submit Payment</button>
+            </div>
+        </div>
+    {{else}}
+       <h3>No items in cart</h3>
+    {{end}}
+</div>
+<script src="/../static/js/cart.js"></script>
+{{end}}
