@@ -1,0 +1,55 @@
+{{define "content"}}
+<h1>Edit Item</h1>
+<form method="POST" action="/shopapi/{{.ID}}" id="edit-item-form" class="general-form">
+    <div class="form-group">
+        <label for="name-input">Item Name:</label>
+        <input type="text" name="name-input" id="name-input" value="{{.itemName}}" required/>
+    </div>
+    <div class="form-group">
+        <label for="gender-input">Choose Gender:</label>
+        <select name="gender-input" id="gender-input" required>
+            <option value="" disabled>Please select a gender</option>
+            {{range .genderOptions}}
+            <option value="{{.}}" {{if eq . $.itemGender}}selected{{end}}>{{.}}</option>
+            {{end}}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="description-input">Item Description:</label>
+        <input type="text" name="description-input" id="description-input" value="{{.itemDescription}}" required/>
+    </div>
+    <div class="form-group">
+        <label for="price-input">Item Price:</label>
+        <input type="number" name="price-input" id="price-input" value="{{.itemPrice}}" required/>
+    </div>
+    <div class="form-group">
+        <label for="category-input">Choose a Category:</label>
+        <select name="category-input" id="category-input" required>
+            <option value="" disabled>Please select a category</option>
+            {{range .categoryOptions}}
+            <option value="{{.}}" {{if eq . $.itemCategory}}selected{{end}}>{{.}}</option>
+            {{end}}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="size-input">Choose a Size:</label>
+        <select name="size-input" id="size-input" required>
+            {{range .sizeOptions}}
+            <option value="{{.}}" {{if eq . $.itemSize}}selected{{end}}>{{.}}</option>
+            {{end}}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="condition-input">Item Condition:</label>
+        <select name="condition-input" id="condition-input" required>
+            <option value="" disabled>Please select item condition</option>
+            {{range .conditionOptions}}
+            <option value="{{.}}" {{if eq . $.itemCondition}}selected{{end}}>{{.}}</option>
+            {{end}}
+        </select>
+    </div>
+    <button type="submit" id="editItemBtn">Save Changes</button>
+</form>
+
+<script src="/../static/js/edititem.js"></script>
+{{end}}
