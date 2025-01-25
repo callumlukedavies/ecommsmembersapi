@@ -32,7 +32,7 @@ func (a *App) loadRoutes() {
 	{
 		shopRoute.GET("/", func(c *gin.Context) { shop.GetAllProductsHandler(c, store) })
 		shopRoute.POST("/create", func(c *gin.Context) { shop.CreateItemHandler(c, store) })
-		shopRoute.PUT("/:ID/:Name", shop.UpdatePriceHandler)
+		shopRoute.POST("/:ID", func(c *gin.Context) { shop.EditItemHandler(c, store) })
 		shopRoute.DELETE("/:ID", shop.DeleteItemHandler)
 		shopRoute.GET("/view/:ID", func(c *gin.Context) { shop.ViewItemHandler(c, store) })
 		shopRoute.POST("/search/", func(c *gin.Context) { shop.SearchHandler(c, store) })
@@ -42,6 +42,9 @@ func (a *App) loadRoutes() {
 		shopRoute.GET("/cart", func(c *gin.Context) { shop.GetShoppingCartHandler(c, store) })
 		shopRoute.POST("/checkout", func(c *gin.Context) { shop.CheckoutCartHandler(c, store) })
 		shopRoute.POST("/removecartitem", func(c *gin.Context) { shop.RemoveCartItemHandler(c, store) })
+		shopRoute.GET("/profile", middleware.AuthorizeUser(store), func(c *gin.Context) { shop.GetProfilePageHandler(c, store) })
+		shopRoute.GET("/edititem/:ID", func(c *gin.Context) { shop.GetEditItemPageHandler(c, store) })
+		shopRoute.GET("/additem", func(c *gin.Context) { shop.GetAddItemPageHandler(c, store) })
 
 	}
 
@@ -50,7 +53,6 @@ func (a *App) loadRoutes() {
 		userDatabaseRoute.POST("/login", func(c *gin.Context) { userDatabase.LoginHandler(c, store) })
 		userDatabaseRoute.GET("/logout", func(c *gin.Context) { userDatabase.LogoutHandler(c, store) })
 		userDatabaseRoute.GET("/signup", userDatabase.GetSignUpPageHandler)
-		userDatabaseRoute.GET("/profile", middleware.AuthorizeUser(store), func(c *gin.Context) { userDatabase.GetProfilePageHandler(c, store) })
 		userDatabaseRoute.GET("/editpage", middleware.AuthorizeUser(store), func(c *gin.Context) { userDatabase.GetEditPageHandler(c, store) })
 		userDatabaseRoute.POST("/createuser", func(c *gin.Context) { userDatabase.CreateUserHandler(c, store) })
 		userDatabaseRoute.POST("/edit-user-firstname", func(c *gin.Context) { userDatabase.EditUserFirstNameHandler(c, store) })

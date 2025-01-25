@@ -35,7 +35,9 @@
         </div>
         
         {{if .itemIsSold}}
-            <div></div>
+            <div class="solditem-text-container">
+                <h3>Sorry! This item has been sold.</h3>
+            </div>
         {{else}}
             <div class="item-button-container">
                 <button id="add-to-cart-btn" data-itemid="{{.ID}}">Add to cart</button>

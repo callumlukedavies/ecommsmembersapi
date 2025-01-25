@@ -38,8 +38,8 @@ func (dataaccess *DataAccess) GetAllItems() ([]Item, error) {
 	return dbItems, nil
 }
 
-func (dataaccess *DataAccess) DeleteItem(itemID int64) error {
-	_, err := dataaccess.DB.Exec("DELETE FROM itemsdb.items WHERE itemID = ?", itemID)
+func (dataaccess *DataAccess) DeleteItem(itemID string) error {
+	_, err := dataaccess.DB.Exec("DELETE FROM itemsdb.items WHERE ItemID = ?", itemID)
 	return err
 }
 
@@ -56,9 +56,11 @@ func (dataaccess *DataAccess) CreateItem(item Item) error {
 	return nil
 }
 
-func (dataaccess *DataAccess) UpdatePrice(itemID int64, newPrice string) error {
+func (dataaccess *DataAccess) UpdateItem(item Item) error {
 
-	_, err := dataaccess.DB.Exec("UPDATE itemsdb.items SET itemPrice = (?) where itemID = (?)", newPrice, itemID)
+	_, err := dataaccess.DB.Exec("UPDATE itemsdb.items SET "+
+		"ItemName = (?), ItemGender= (?), ItemDescription= (?), ItemPrice= (?), ItemIsSold= (?), ItemSize= (?), ItemCategory= (?), ItemCondition = (?)"+
+		"where ItemID = (?)", item.Name, item.Gender, item.Description, item.Price, item.IsSold, item.Size, item.Category, item.Condition, item.ID)
 
 	if err != nil {
 		return err
@@ -115,13 +117,15 @@ func (dataaccess *DataAccess) GetItemsByQueryTerm(query string) ([]Item, error) 
 	return dbItems, nil
 }
 
-func (dataaccess *DataAccess) getSortedItemsByPriceInc(query string) ([]Item, error) {
+func (dataaccess *DataAccess) getSortedItemsByPriceInc(query, category string) ([]Item, error) {
 	var rows *sql.Rows
 	var err error
-	if query == "" {
-		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items ORDER BY ItemPrice")
-	} else {
+	if category != "" {
+		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items WHERE ItemCategory LIKE ? ORDER BY ItemPrice", category)
+	} else if query != "" {
 		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items WHERE ItemName LIKE ? ORDER BY ItemPrice", query)
+	} else {
+		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items ORDER BY ItemPrice")
 	}
 
 	if err != nil {
@@ -151,13 +155,15 @@ func (dataaccess *DataAccess) getSortedItemsByPriceInc(query string) ([]Item, er
 	return dbItems, nil
 }
 
-func (dataaccess *DataAccess) getSortedItemsByPriceDec(query string) ([]Item, error) {
+func (dataaccess *DataAccess) getSortedItemsByPriceDec(query, category string) ([]Item, error) {
 	var rows *sql.Rows
 	var err error
-	if query == "" {
-		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items ORDER BY ItemPrice DESC")
-	} else {
+	if category != "" {
+		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items WHERE ItemCategory LIKE ? ORDER BY ItemPrice DESC", category)
+	} else if query != "" {
 		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items WHERE ItemName LIKE ? ORDER BY ItemPrice DESC", query)
+	} else {
+		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items ORDER BY ItemPrice DESC")
 	}
 
 	if err != nil {
@@ -218,8 +224,16 @@ func (dataaccess *DataAccess) getItemsByCategory(category string) ([]Item, error
 	return dbItems, nil
 }
 
-func (dataaccess *DataAccess) GetItemsBySeller(SellerID int) ([]Item, error) {
-	rows, err := dataaccess.DB.Query("SELECT * FROM itemsdb.items WHERE ItemSellerID = ? LIMIT 8", SellerID)
+func (dataaccess *DataAccess) GetItemsBySeller(userID, limit int) ([]Item, error) {
+	var rows *sql.Rows
+	var err error
+	if limit < 0 {
+		// Get all items by seller
+		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items WHERE ItemSellerID = ?", userID)
+	} else {
+		rows, err = dataaccess.DB.Query("SELECT * FROM itemsdb.items WHERE ItemSellerID = ? LIMIT ?", userID, limit)
+
+	}
 
 	if err != nil {
 		fmt.Print(err)

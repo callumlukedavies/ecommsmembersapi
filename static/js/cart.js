@@ -90,6 +90,7 @@ checkoutCartButton.addEventListener('click', function(){
     })
     .then(response => {
         if (response.ok) {
+            window.location.href = "/shopapi/";
             return response.json();
         }
         throw new Error('UpdateCartHandler could not add item to cart.');

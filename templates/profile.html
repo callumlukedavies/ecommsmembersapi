@@ -1,109 +1,51 @@
 {{define "content"}}
 <div class="profile-body">
-    <div class="userControlsClass">
-        <a href="/membersapi/editpage" id="editProfileBtn">Edit Profile</a>
-        <a href="javascript:void(0)" onclick="confirmDelete()" id="deleteProfileBtn">Delete Profile</a>
+    
+    <div id="user-details-container">
+        <div id="profile-username"><strong>{{.FirstName }} {{.LastName }}</strong></div>
+        <a href="/membersapi/editpage" id="edit-profile-btn">Edit Profile</a>
+    </div>
+
+    <div id="user-small-details">
+        <h5><strong>{{.EmailAddress}}</strong></h5>
+        <h5><strong>{{.DateOfBirth}}</strong></h5>
     </div>
     
-    <div id="userDetailsContainer">
-        <h6><strong>Name:</strong> {{.FirstName }} {{.LastName }}</h6>
-        <h6><strong>Email Address:</strong> {{.EmailAddress }}</h6>
-        <h6><strong>Date of Birth:</strong> {{.DateOfBirth}}</h6>
+    <div id="items-header-container">
+        <div class="spacer"></div>
+        <h1 id="items-header">Your Items</h1>
+        <a href="/shopapi/additem" id="add-item-btn">Add new item</a>
     </div>
     
-    <h1>Your Items</h1>
-    <div id="userItemsContainer">
-        <div id="multiItemCarousel" class="carousel slide" data-ride="carousel">
-            <div class="bottom-carousel-inner">
-                {{range $item := .otherItems}}
-                    <div class="bottom-carousel-item">
-                        <a href="/shopapi/view/{{$item.ID}}" class="item-card">
-                            <div class="grid-item" id="item-{{$item.ID}}">
-                                <div class="image-container">
-                                    <img src="/images/{{$item.GalleryImage}}" class="d-block w-100" alt="{{$item.GalleryImage}}">
-                                </div>
-                                <div class="item-info">
-                                    <p>{{$item.Name}} - {{$item.Size}}</p>
-                                    <p class="price">£{{$item.Price}}</p>
-                                </div>
+    <div id="user-items-container">
+        <div class="profile-grid-container" id="items">
+            {{range $item := .Items}} 
+                <div class="profile-item-card">
+                    <div class="profile-grid-item" id="item-{{$item.ID}}">
+                        <a href="/shopapi/view/{{$item.ID}}">
+                            <div class="profile-image-container">
+                                <img src="/images/{{$item.GalleryImage}}" class="d-block w-100" alt="{{$item.GalleryImage}}">
                             </div>
                         </a>
+                        <div class="item-info">
+                            <p>{{$item.Name}} - {{$item.Size}}</p>
+                            <p class="price">£{{$item.Price}}</p>
+                        </div>
+                        <div class="item-controls-container">
+                            <a href="/shopapi/edititem/{{$item.ID}}" id="edit-item-btn">Edit</a>
+                            <button class="delete-item-btn" data-itemid="{{$item.ID}}">Delete</button>
+                        </div>
                     </div>
-                {{end}}
-            </div>
-        
-            <!-- Carousel controls -->
-            <button id="carousel-control-prev" class="carousel-control-prev" data-bs-target="#multiItemCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </button>
-            <button class="carousel-control-next" data-bs-target="#multiItemCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </button>
+                </div>
+            {{end}}
         </div>
         <script src="/../static/js/itemview.js"></script>
     </div>
-    
-    <h1>Add New Item</h1>
-    <form method="POST" action="/shopapi/create" id="addItemForm" class="add-item-form" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="name-input">Item Name:</label>
-            <input type="text" name="name-input" id="name-input" placeholder="Enter item name" required/>
-        </div>
-        <div class="form-group">
-            <label for="gender-input">Choose Gender:</label>
-            <select name="gender-input" id="gender-input" required>
-                <option value="" disabled selected>Please select a gender</option>
-                <option value="Womens">Womens</option>
-                <option value="Mens">Mens</option>
-                <option value="Unisex">Unisex</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="description-input">Item Description:</label>
-            <input type="text" name="description-input" id="description-input" placeholder="Please enter item description" required/>
-        </div>
-        <div class="form-group">
-            <label for="price-input">Item Price:</label>
-            <input type="number" name="price-input" id="price-input" placeholder="Please enter item price" required/>
-        </div>
-        <div class="form-group">
-            <label for="category-input">Choose a Category:</label>
-            <select name="category-input" id="category-input" required>
-                <option value="" disabled selected>Please select a category</option>
-                <option value="Coat">Coat</option>
-                <option value="Jacket">Jacket</option>
-                <option value="Knitwear">Knitwear</option>
-                <option value="Sweatshirt">Sweatshirt</option>
-                <option value="Top">Top</option>
-                <option value="Bottoms">Bottom</option>
-                <option value="Shorts">Shorts</option>
-                <option value="Shoe">Shoe</option>
-                <option value="Accessories">Accessories</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="size-input">Choose a Size:</label>
-            <select name="size-input" id="size-input" required></select>
-        </div>
-        <div class="form-group">
-            <label for="condition-input">Item Condition:</label>
-            <select name="condition-input" id="condition-input" required>
-                <option value="" disabled selected>Please select item condition</option>
-                <option value="Brand New">Brand New</option>
-                <option value="Like New">Like New</option>
-                <option value="Good Condition">Good Condition</option>
-                <option value="Fair Condition">Fair Condition</option>
-                <option value="Poor Condition">Poor Condition</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="image-input">Upload photos:</label>
-            <input type="file" name="image-input" id="image-input" accept="image/*" multiple required/>            
-        </div>
-        <button type="submit" id="createItemBtn">Add Item</button>
-    </form>
+
+    <div class="user-controls-class">
+        <h4>We don't want to show you this button, but if you have to go...</h4>
+        <a href="javascript:void(0)" onclick="confirmDelete()" id="delete-profile-btn">Delete Account</a>
+    </div>
 </div>
 
 

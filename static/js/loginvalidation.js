@@ -31,7 +31,7 @@ document.getElementById('form-login').addEventListener('submit', function (event
                 }
             });
         } else {
-            window.location.href = '/membersapi/profile';
+            window.location.href = '/shopapi/profile';
             return response.json();
         }
     })
@@ -40,7 +40,7 @@ document.getElementById('form-login').addEventListener('submit', function (event
             alert('Form submitted successfully!');
             console.log("Form submitted successfully");
 
-            window.location.href = '/membersapi/profile'; // Redirect to the profile page
+            window.location.href = '/shopapi/profile'; // Redirect to the profile page
         }
     })
     .catch(error => {

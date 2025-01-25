@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +15,22 @@ import (
 
 type Shop struct {
 	DataAccess DataAccess
+}
+
+var GenderOptions = []string{"Womens", "Mens", "Unisex"}
+var CategoryOptions = []string{"Coat", "Jacket", "Knitwear", "Sweatshirt", "Top", "Bottoms", "Shorts", "Shoe", "Accessories"}
+var ConditionOptions = []string{"Brand New", "Like New", "Good Condition", "Fair Condition", "Poor Condition"}
+
+var categoryQueryMap = map[string]bool{
+	"%Coat%":        true,
+	"%Jacket%":      true,
+	"%Knitwear%":    true,
+	"%Sweatshirt%":  true,
+	"%Top%":         true,
+	"%Bottoms%":     true,
+	"%Shorts%":      true,
+	"%Shoe%":        true,
+	"%Accessories%": true,
 }
 
 func (shop *Shop) GetAllProductsHandler(c *gin.Context, store *sessions.CookieStore) {
@@ -157,35 +172,68 @@ func (shop *Shop) CreateItemHandler(c *gin.Context, store *sessions.CookieStore)
 
 	if err != nil {
 		fmt.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Error Creating item"})
 		return
 	}
+
+	c.Redirect(http.StatusFound, "/shopapi/")
 }
 
-func (shop *Shop) UpdatePriceHandler(c *gin.Context) {
-	itemPrice := c.PostForm("price")
-	paramID := c.Param("ID")
-	paramName := c.Param("Name")
-	itemID, _ := strconv.ParseInt(paramID, 10, 64)
-	err := shop.DataAccess.UpdatePrice(itemID, itemPrice)
-
+func (shop *Shop) EditItemHandler(c *gin.Context, store *sessions.CookieStore) {
+	itemID := c.Param("ID")
+	session, err := store.Get(c.Request, "session")
 	if err != nil {
-		fmt.Println(err)
+		// User session may not exist, so don't return from error
+		log.Println("EditItemHandler: Error getting session: %s", err.Error())
+	}
+
+	isAuthenticated := session.Values["Authenticated"].(bool)
+	if !isAuthenticated {
+		log.Println("EditItemHandler: User must be authenticated to edit an item")
+		c.String(http.StatusBadRequest, "User must be authenticated before editing an item. Please log in.")
 		return
 	}
 
-	c.HTML(http.StatusOK, "item.html", gin.H{
-		"Name":  paramName,
-		"Price": itemPrice,
-		"ID":    itemID,
-	})
+	itemName := c.PostForm("name-input")
+	itemGender := c.PostForm("gender-input")
+	itemDesc := c.PostForm("description-input")
+	itemPrice := c.PostForm("price-input")
+	itemSize := c.PostForm("size-input")
+	itemCategory := c.PostForm("category-input")
+	itemCondition := c.PostForm("condition-input")
+
+	itemDetails := Item{
+		ID:          itemID,
+		Name:        itemName,
+		Gender:      itemGender,
+		Description: itemDesc,
+		Price:       itemPrice,
+		IsSold:      false,
+		Size:        itemSize,
+		Category:    itemCategory,
+		Condition:   itemCondition,
+	}
+
+	err = shop.DataAccess.UpdateItem(itemDetails)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Error editing item"})
+		return
+	}
+
+	c.Redirect(http.StatusFound, "/shopapi/")
 }
 
 func (shop *Shop) DeleteItemHandler(c *gin.Context) {
-	param := c.Param("ID")
-	id, _ := strconv.ParseInt(param, 10, 64)
-	shop.DataAccess.DeleteItem(id)
+	itemID := c.Param("ID")
+	err := shop.DataAccess.DeleteItem(itemID)
+	if err != nil {
+		log.Printf("DeleteItemHandler: Error deleting item: %s", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete item"})
+		return
+	}
 
-	c.HTML(http.StatusOK, "deleteditem.html", nil)
+	c.JSON(http.StatusOK, gin.H{"message": "Item deleted successfully"})
 }
 
 func (shop *Shop) ViewItemHandler(c *gin.Context, store *sessions.CookieStore) {
@@ -208,7 +256,7 @@ func (shop *Shop) ViewItemHandler(c *gin.Context, store *sessions.CookieStore) {
 	}
 
 	// Retrieve items by this Seller
-	itemsBySeller, err := shop.DataAccess.GetItemsBySeller(itemData.SellerID)
+	itemsBySeller, err := shop.DataAccess.GetItemsBySeller(itemData.SellerID, 8)
 	if err != nil {
 		log.Printf("ViewItemHandler: Error getting items by seller: %s", err.Error())
 		return
@@ -224,7 +272,6 @@ func (shop *Shop) ViewItemHandler(c *gin.Context, store *sessions.CookieStore) {
 
 	c.Header("Content-Type", "text/html")
 
-	// Execute the main layout template with the "signup" content embedded
 	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
 		"isAuthenticated":      isAuthenticated,
 		"ID":                   itemData.ID,
@@ -260,9 +307,6 @@ func (shop *Shop) SearchHandler(c *gin.Context, store *sessions.CookieStore) {
 	queryTerm := c.PostForm("search-input")
 	query := "%" + queryTerm + "%"
 
-	order := c.Param("order-input")
-	println(order)
-
 	items, err := shop.DataAccess.GetItemsByQueryTerm(query)
 	if err != nil {
 		log.Fatal(err)
@@ -287,8 +331,6 @@ func (shop *Shop) SearchHandler(c *gin.Context, store *sessions.CookieStore) {
 
 	session.Values["CurrentQuery"] = query
 	session.Save(c.Request, c.Writer)
-
-	fmt.Printf("Session Values: %v\n", session.Values)
 
 	c.Header("Content-Type", "text/html")
 
@@ -315,8 +357,6 @@ func (shop *Shop) SortItemsHandler(c *gin.Context, store *sessions.CookieStore) 
 		log.Println("SortItemsHandler: Error getting session: %s", err.Error())
 	}
 
-	fmt.Printf("Session Values: %v\n", session.Values)
-
 	isAuthenticated := session.Values["Authenticated"]
 
 	var query string
@@ -330,15 +370,25 @@ func (shop *Shop) SortItemsHandler(c *gin.Context, store *sessions.CookieStore) 
 		}
 	}
 
+	isCategory := categoryQueryMap[query]
+	category := ""
+	gridTitle := ""
+	if isCategory {
+		category = util.RemoveQueryBrackets(query)
+		gridTitle = category
+	} else {
+		gridTitle = query
+	}
+
 	order := c.PostForm("order-input")
 
 	var items []Item
 	var sortErr error
 	switch order {
 	case "price-inc":
-		items, sortErr = shop.DataAccess.getSortedItemsByPriceInc(query)
+		items, sortErr = shop.DataAccess.getSortedItemsByPriceInc(query, category)
 	case "price-dec":
-		items, sortErr = shop.DataAccess.getSortedItemsByPriceDec(query)
+		items, sortErr = shop.DataAccess.getSortedItemsByPriceDec(query, category)
 	}
 
 	if sortErr != nil {
@@ -370,7 +420,7 @@ func (shop *Shop) SortItemsHandler(c *gin.Context, store *sessions.CookieStore) 
 		"items":                response.Items,
 		"isAuthenticated":      isAuthenticated,
 		"ShowCategoriesBanner": true,
-		"GridTitle":            query,
+		"GridTitle":            gridTitle,
 	})
 
 	if err != nil {
@@ -415,8 +465,6 @@ func (shop *Shop) SearchByCategoryHandler(c *gin.Context, store *sessions.Cookie
 
 	session.Values["CurrentQuery"] = category
 	session.Save(c.Request, c.Writer)
-
-	fmt.Printf("Session Values: %v\n", session.Values)
 
 	c.Header("Content-Type", "text/html")
 
@@ -631,4 +679,159 @@ func (shop *Shop) RemoveCartItemHandler(c *gin.Context, store *sessions.CookieSt
 	session.Save(c.Request, c.Writer)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Item removed from cart!"})
+}
+
+func (shop *Shop) GetProfilePageHandler(c *gin.Context, store *sessions.CookieStore) {
+
+	// Get session values
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		log.Println("GetProfilePageHandler: Error getting session: %s", err.Error())
+	}
+
+	firstname := session.Values["FirstName"]
+	lastname := session.Values["LastName"]
+	email := session.Values["EmailAddress"]
+	dateofbirth := session.Values["DateOfBirth"]
+	sellerID := session.Values["UserID"]
+
+	var userID int
+	var ok bool
+	if sellerID != nil {
+		userID, ok = sellerID.(int)
+		if !ok {
+			log.Println("GetProfilePageHandler: Error converting sellerID to string")
+			c.String(http.StatusInternalServerError, "Error converting session sellerID to string")
+			return
+		}
+	} else {
+		c.String(http.StatusOK, "User ID invalid")
+		return
+	}
+
+	var dob string
+	if dateofbirth != nil {
+		dob, ok = dateofbirth.(string)
+		if !ok {
+			log.Println("GetProfilePageHandler: Error converting date of birth to string")
+			c.String(http.StatusInternalServerError, "Error converting session date of birth to string")
+			return
+		}
+	} else {
+		c.String(http.StatusOK, "Date of Birth - Invalid Format")
+		return
+	}
+
+	parsedDate, err := time.Parse("2006-01-02", dob)
+	if err != nil {
+		fmt.Println("Error parsing date:", err)
+		return
+	}
+
+	formattedDate := parsedDate.Format("02 January 2006")
+
+	items, err := shop.DataAccess.GetItemsBySeller(userID, -1)
+	if err != nil {
+		log.Println("GetProfilePageHandler: Error retrieving items for seller")
+		c.String(http.StatusInternalServerError, " Error retrieving items for seller")
+		err = nil
+	}
+
+	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/profile.html")
+	if err != nil {
+		log.Printf("GetProfilePageHandler: Error parsing templates: %s", err.Error())
+	}
+
+	c.Header("Content-Type", "text/html")
+
+	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
+		"FirstName":       firstname,
+		"LastName":        lastname,
+		"EmailAddress":    email,
+		"DateOfBirth":     formattedDate,
+		"isAuthenticated": true,
+		"Items":           items,
+	})
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
+	}
+}
+
+func (shop *Shop) GetAddItemPageHandler(c *gin.Context, store *sessions.CookieStore) {
+
+	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/additem.html")
+	if err != nil {
+		log.Printf("GetAddItemPageHandler: Error parsing templates: %s", err.Error())
+	}
+
+	c.Header("Content-Type", "text/html")
+
+	err = templates.ExecuteTemplate(c.Writer, "layout.html", nil)
+
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
+	}
+}
+
+func (shop *Shop) GetEditItemPageHandler(c *gin.Context, store *sessions.CookieStore) {
+
+	session, err := store.Get(c.Request, "session")
+	if err != nil {
+		// User session may not exist, so don't return from error
+		log.Println("GetEditItemPageHandler: Error getting session: %s", err.Error())
+	}
+
+	isAuthenticated := session.Values["Authenticated"]
+
+	itemID := c.Param("ID")
+
+	// Retrieve item from database
+	itemData, err := shop.DataAccess.GetItem(itemID)
+	if err != nil {
+		log.Printf("GetEditItemPageHandler: Error getting Item data: %s", err.Error())
+		return
+	}
+
+	// Clothing size options
+	var sizeOptions []string
+	bottomSizeOptions := []string{"28", "30", "32", "34", "36"}
+	shoeSizeOptions := []string{"3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}
+	regularSizeOptions := []string{"XS", "S", "M", "L", "XL"}
+
+	switch itemData.Category {
+	case "Bottoms":
+		sizeOptions = bottomSizeOptions
+	case "Shoes":
+		sizeOptions = shoeSizeOptions
+	default:
+		sizeOptions = regularSizeOptions
+	}
+
+	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/edititem.html")
+	if err != nil {
+		log.Printf("GetEditItemPageHandler: Error parsing templates: %s", err.Error())
+	}
+
+	c.Header("Content-Type", "text/html")
+
+	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
+		"isAuthenticated":      isAuthenticated,
+		"ID":                   itemData.ID,
+		"itemName":             itemData.Name,
+		"itemGender":           itemData.Gender,
+		"itemDescription":      itemData.Description,
+		"itemPrice":            itemData.Price,
+		"itemCategory":         itemData.Category,
+		"itemCondition":        itemData.Condition,
+		"itemSize":             itemData.Size,
+		"genderOptions":        GenderOptions,
+		"categoryOptions":      CategoryOptions,
+		"conditionOptions":     ConditionOptions,
+		"sizeOptions":          sizeOptions,
+		"ShowCategoriesBanner": false,
+	})
+
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
+	}
 }

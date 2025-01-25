@@ -128,3 +128,13 @@ func GetFirstImageFromString(imagesString string) string {
 
 	return imagesString[0:endChar]
 }
+
+func RemoveQueryBrackets(queryString string) string {
+	length := len(queryString)
+
+	if queryString[0] == '%' && queryString[length-1] == '%' {
+		return queryString[1 : length-1]
+	}
+
+	return queryString
+}

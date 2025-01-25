@@ -188,3 +188,11 @@ img {
 #other-items-header {
     margin: 30px;
 }
+
+.solditem-text-container {
+    text-align: center;
+    background-color: #000;
+    color: #fff;
+    padding: 20px;
+
+}

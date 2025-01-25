@@ -310,39 +310,6 @@ func (UserDatabase *UserDatabase) GetSignUpPageHandler(c *gin.Context) {
 	}
 }
 
-func (UserDatabase *UserDatabase) GetProfilePageHandler(c *gin.Context, store *sessions.CookieStore) {
-
-	// Get session values
-	session, err := store.Get(c.Request, "session")
-	if err != nil {
-		log.Println("GetProfilePageHandler: Error getting session: %s", err.Error())
-	}
-
-	firstname := session.Values["FirstName"]
-	lastname := session.Values["LastName"]
-	email := session.Values["EmailAddress"]
-	dateofbirth := session.Values["DateOfBirth"]
-
-	templates, err := template.ParseFiles("templates/layout.html", "templates/navbar.html", "templates/profile.html")
-	if err != nil {
-		log.Printf("GetProfilePageHandler: Error parsing templates: %s", err.Error())
-	}
-
-	c.Header("Content-Type", "text/html")
-
-	// Execute the main layout template with the "signup" content embedded
-	err = templates.ExecuteTemplate(c.Writer, "layout.html", gin.H{
-		"FirstName":       firstname,
-		"LastName":        lastname,
-		"EmailAddress":    email,
-		"DateOfBirth":     dateofbirth,
-		"isAuthenticated": true,
-	})
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Error rendering template: %v", err)
-	}
-}
-
 func (UserDatabase *UserDatabase) GetEditPageHandler(c *gin.Context, store *sessions.CookieStore) {
 
 	// Get session values
